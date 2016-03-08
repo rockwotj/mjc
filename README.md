@@ -1,10 +1,15 @@
+# Mini Java Compiler
+
+
+
+### Project Template Credits
+
+Thanks to (ae6rt)[https://github.com/ae6rt/gradle-antlr4-template] for 
+the antlr gradle project template 
+
 A Gradle build template for ANTLR4 projects.  Just type "gradlew
 build" to compile the grammar files and begin using in your src/main
 and src/test source roots.
-
-This work inspired by
-
-http://fenrock.wordpress.com/2012/05/17/gradle-and-antlr-3-x/
 
 Remove the 
 
@@ -12,7 +17,3 @@ Remove the
 
 if you are not using IntelliJ.  This is an IDE nice to have that
 adds the generated sources to the IDE source roots.
-
-The g4 grammar and t.* sample input files were taken from Terence
-Parr's source code for the book The Definitive ANTLR4 Reference.
-

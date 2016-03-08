@@ -1,6 +1,9 @@
-description = "ANTLR4 project template"
+description = "Mini Java Compiler"
 apply plugin: 'java'
+apply plugin: 'application'
 apply from: file('gradle/idea.gradle')
+
+mainClassName = "edu.rosehulman.csse.mjc.Compiler"
 
 ext.versions = [
         slf4j: "1.7.2",
@@ -9,8 +12,8 @@ ext.versions = [
 ]
 
 ext.antlr = [
-        grammarpackage: "org.carpediem",
-        antlrSource: 'src/main/antlr',
+        grammarpackage: "edu.rosehulman.csse.mjc",
+        antlrSource: "src/main/antlr",
         destinationDir: "src/generated-sources/java"
 ]
 
@@ -27,22 +30,13 @@ configurations {
 dependencies {
     compile group: "org.slf4j", name: "slf4j-api", version: versions.slf4j
     compile group: "ch.qos.logback", name: "logback-classic", version: versions.logback
-    compile group: "org.antlr", name: "antlr4-runtime", version: "4.0"
-    antlr4 group: "org.antlr", name: "antlr4", version: "4.0"
+    compile group: "org.antlr", name: "antlr4-runtime", version: "4.+"
+    antlr4 group: "org.antlr", name: "antlr4", version: "4.+"
     testCompile group: "junit", name: "junit", version: versions.junit
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '1.6'
-}
-
-tasks.withType(Compile) {
-    options.encoding = 'UTF-8'
-}
-
-tasks.withType(Test) {
-    systemProperties = System.getProperties()
-    testLogging.showStandardStreams = true
 }
 
 task antlrOutputDir << {
