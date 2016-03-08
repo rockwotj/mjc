@@ -1,5 +1,6 @@
 # Mini Java Compiler
 
+A compiler for a small subset of the Java Programming Language
 
 
 ### Project Template Credits
