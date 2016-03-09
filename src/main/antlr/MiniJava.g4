@@ -1,9 +1,13 @@
 grammar MiniJava;		
-prog:	(expr NEWLINE)* ;
-expr:	expr ('*'|'/') expr
-    |	expr ('+'|'-') expr
-    |	INT
+prog:	(expr Newline)* ;
+expr:	expr (Multiply|Division) expr
+    |	expr (Plus|Minus) expr
+    |	Integer
     |	'(' expr ')'
     ;
-NEWLINE : [\r\n]+ ;
-INT     : [0-9]+ ;
+Minus    : '-' ;
+Plus     : '+' ;
+Multiply : '*' ;
+Division : '/' ;
+Newline  : [\r\n]+ ;
+Integer      : [0-9]+ ;
