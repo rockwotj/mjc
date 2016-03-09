@@ -1,12 +1,14 @@
 package edu.rosehulman.csse.mjc;
 
 
-import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.Token;
 
+import java.io.IOException;
+
 public class Compiler {
-    public static void main(String[] args) {
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRInputStream("123+321-+12"));
+    public static void main(String[] args) throws IOException {
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/main/resources/SimpleTokensTest.txt"));
         for (Token token = lexer.nextToken();
              token.getType() != MiniJavaLexer.EOF;
              token = lexer.nextToken()) {
