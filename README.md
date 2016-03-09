@@ -4,6 +4,24 @@
 
 A compiler for a small subset of the Java Programming Language
 
+## Project Specification
+
+The syntax for the language, and the specifications can be found in
+the docs directory.
+
+## Development
+
+### Running the Project
+
+This project uses gradle to run, build and manage dependencies. 
+You can invoke gradle using `./gradlew` on unix systems or via 
+`gradlew.bat` on windows system if you don't have gradle installed
+yourself. These 'wrapper' scripts can be used in place of the `gradle`
+command below.
+
+The project can be built, along with the grammer being generated using 
+antlr by running `gradle build`. You can run the compiler via 
+`gradle run` and finally you can run the tests with `gradle check`.
 
 ### Project Template Credits
 
