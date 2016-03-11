@@ -14,19 +14,18 @@ public class LexerTest {
 
     @Test
     public void runFullTests() throws IOException {
-        File folder = new File("src/test/resources/LexerFullTests");
+        File folder = new File("src/test/resources/SampleLexerTestcases");
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
-            if (file.isFile()) {
+            if (file.isFile() && file.getName().endsWith(".java")) {
                 String baseFileName = file.getName().replaceFirst("[.][^.]+$", "");
                 List<String> lexicalStructure = new LexicalAnalyzer(file).getLexicalStructures();
-                File correctOutput = new File("src/test/resources/LexerExpectedOutput/" + baseFileName + ".out");
+                File correctOutput = new File("src/test/resources/SampleLexerTestcases/" + baseFileName + ".out");
                 List<String> expectedStructure = Files.readAllLines(correctOutput.toPath());
-                System.out.println("Running test for: " + baseFileName);
+                System.out.println("Running test for: " + file.getName());
                 for (int i = 0; i < expectedStructure.size(); i++) {
                     assertEquals(expectedStructure.get(i), lexicalStructure.get(i));
                 }
-                break; // Only test the first file for now.
             }
         }
     }
