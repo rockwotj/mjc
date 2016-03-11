@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class LexerTest {
 
@@ -23,7 +23,10 @@ public class LexerTest {
                 File correctOutput = new File("src/test/resources/LexerExpectedOutput/" + baseFileName + ".out");
                 List<String> expectedStructure = Files.readAllLines(correctOutput.toPath());
                 System.out.println("Running test for: " + baseFileName);
-                assertTrue(lexicalStructure.equals(expectedStructure));
+                for (int i = 0; i < expectedStructure.size(); i++) {
+                    assertEquals(expectedStructure.get(i), lexicalStructure.get(i));
+                }
+                break; // Only test the first file for now.
             }
         }
     }
