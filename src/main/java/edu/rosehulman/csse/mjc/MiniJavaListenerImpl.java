@@ -1,6 +1,11 @@
 package edu.rosehulman.csse.mjc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MiniJavaListenerImpl extends MiniJavaBaseListener {
+
+    private List<String> recognizedStatements = new ArrayList<>();
 
     @Override
     public void enterBlock(MiniJavaParser.BlockContext ctx) {
