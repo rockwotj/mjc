@@ -41,9 +41,9 @@ ReservedWord, String
 Operator, !
 ReservedWord, main
 ID, System
-Delimiter .
+Delimiter, .
 ID, out
-Delimiter .
+Delimiter, .
 ID, printlnefgh90
 ID, for
 Delimiter, (

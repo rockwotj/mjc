@@ -11,10 +11,10 @@ import java.util.List;
 
 public class LexicalAnalyzer {
 
-    private final MiniJava lexer;
+    private final Lexer lexer;
 
     public LexicalAnalyzer(File file) throws IOException {
-        lexer = new MiniJava(new ANTLRFileStream(file.getAbsolutePath()));
+        lexer = new MiniJavaLexOnly(new ANTLRFileStream(file.getAbsolutePath()));
     }
 
     public Lexer getLexer() {
@@ -22,13 +22,13 @@ public class LexicalAnalyzer {
     }
 
     public List<String> getLexicalStructures() {
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         for (Token token = lexer.nextToken();
-                    token.getType() != MiniJava.EOF;
+                    token.getType() != MiniJavaLexOnly.EOF;
                     token = lexer.nextToken()) {
-            if (token.getType() == MiniJava.Whitespace) continue;
-            if (token.getType() == MiniJava.Comment) continue;
-            tokens.add(MiniJava.VOCABULARY.getDisplayName(token.getType()) +
+            if (token.getType() == MiniJavaLexOnly.Whitespace) continue;
+            if (token.getType() == MiniJavaLexOnly.Comment) continue;
+            tokens.add(MiniJavaLexOnly.VOCABULARY.getDisplayName(token.getType()) +
                     ", " +
                     token.getText());
         }
