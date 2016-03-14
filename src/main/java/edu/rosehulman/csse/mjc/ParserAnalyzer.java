@@ -7,15 +7,12 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * Created by rockwotj on 3/14/16.
- */
 public class ParserAnalyzer {
     private final MiniJavaErrorListener errorListener;
     private final MiniJavaListenerImpl listener;
 
     public ParserAnalyzer(File file) throws IOException {
-        MiniJava lexer = new MiniJava(new ANTLRFileStream(file.getAbsolutePath()));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream(file.getAbsolutePath()));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         // Pass the tokens to the parser

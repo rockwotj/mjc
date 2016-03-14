@@ -13,7 +13,7 @@ public class MiniJavaErrorListener extends BaseErrorListener {
 
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-        //System.err.printf("Syntax Error: line: %d, char: %d, message: %s%n", line, charPositionInLine, msg);
+        System.err.printf("Syntax Error: line: %d, char: %d, message: %s%n", line, charPositionInLine, msg);
         exceptions.add(e);
     }
 

@@ -9,7 +9,7 @@ import java.io.IOException;
 public class Compiler {
     public static void main(String[] args) throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleParserTestcases/testcase01_04.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleParserTestcases/testcase00_09.java"));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -18,7 +18,7 @@ public class Compiler {
         MiniJavaParser parser = new MiniJavaParser(tokens);
 
         // Listen for errors
-        BaseErrorListener errorListener = new MiniJavaErrorListener();
+        MiniJavaErrorListener errorListener = new MiniJavaErrorListener();
         parser.addErrorListener(errorListener);
 
         // Specify parser grammer entry point
@@ -29,7 +29,6 @@ public class Compiler {
         MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
 
         walker.walk(listener, progContext);
-
     }
 
 }

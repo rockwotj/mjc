@@ -10,9 +10,6 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
-/**
- * Created by rockwotj on 3/14/16.
- */
 public class ParserTest {
 
     public static List<String> VALID_PROGRAMS = Arrays.asList(
@@ -23,7 +20,7 @@ public class ParserTest {
 
     @Test
     public void sampleParserTest() throws IOException {
-        File folder = new File("src/test/resources/SampleParserTestcases");
+        File folder = new File("./src/test/resources/SampleParserTestcases/");
         File[] listOfFiles = folder.listFiles();
         for (File file : listOfFiles) {
             if (file.isFile() && file.getName().endsWith(".java")) {
