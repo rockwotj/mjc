@@ -4,15 +4,21 @@ program : mainClassDecl (classDecl)* ;
 mainClassDecl : 'class' Id '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' Id')' '{' (stmt)* '}' '}' ;
 classDecl : 'class' Id ('extends' Id)? '{' (classVarDecl)* (methodDecl)* '}' ;
 classVarDecl : type Id ';' ;
-methodDecl : 'public' type Id '(' formal (',' formal)* ')' '{' (stmt)* 'return' expr ';' '}' ;
+methodDecl : 'public' type Id ('(' (formal (',' formal)*)? ')' | '()') '{' (stmt)* 'return' expr ';' '}' ;
 formal : type Id;
 type : 'int' | 'boolean' | Id ;
-stmt : type Id  '=' expr ';'
-          | '{' (stmt)* '}'
-          | 'if' '(' expr ')' stmt 'else' stmt
-          | 'while' '(' expr ')' stmt
-          | 'System.out.println' '(' expr')' ';'
-          | Id  '=' expr ;
+stmt : varDecl
+          | block
+          | ifElse
+          | whileDecl
+          | print
+          | assigment ;
+varDecl : type Id  '=' expr ';' ;
+block : '{' (stmt)* '}' ;
+ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
+whileDecl : 'while' '(' expr ')' stmt ;
+print : 'System.out.println' '(' expr')' ';' ;
+assigment : Id  '=' expr ';' ;
 expr : expr ('+' | '-' | '*' | '/' | '<' | '<=' | '>=' | '>' | '==' | '!=' | '&&' | '||') expr
        | ( '-' | '!' ) expr
        | expr '.' Id '(' expr (',' expr)* ')'

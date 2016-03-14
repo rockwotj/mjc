@@ -20,13 +20,13 @@ class FacMethod {
     int dummy2;
     
 	public int factorial(int num) {
-		int retval = 0;
-		
+			int retval = 0;
+
 		if (num <= 1)
 			retval = num;
 		else
 			retval = num * this.factorial(num - 1);
-		
+
         Math math = new Math();
 		System.out.println(math.mod(retval, num));
 		

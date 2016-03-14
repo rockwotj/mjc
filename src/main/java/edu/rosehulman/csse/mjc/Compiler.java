@@ -20,11 +20,11 @@ public class Compiler {
         MiniJavaParser parser = new MiniJavaParser(tokens);
 
         // Specify parser grammer entry point
-//        MiniJavaParser.ProgramContext progContext = parser.program();
+        MiniJavaParser.ProgramContext progContext = parser.program();
 
         // Walk parse tree and attach our listener
-//        ParseTreeWalker walker = new ParseTreeWalker();
-//        MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
-//        walker.walk(listener, progContext);
+        ParseTreeWalker walker = new ParseTreeWalker();
+        MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
+        walker.walk(listener, progContext);
     }
 }
