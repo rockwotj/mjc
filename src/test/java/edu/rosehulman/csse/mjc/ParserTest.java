@@ -1,6 +1,8 @@
 package edu.rosehulman.csse.mjc;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.util.List;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
+@RunWith(Parameterized.class)
 public class ParserTest {
 
     public static List<String> VALID_PROGRAMS = Arrays.asList(

@@ -2,6 +2,7 @@ package edu.rosehulman.csse.mjc;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class MiniJavaListenerImpl extends MiniJavaBaseListener {
 
@@ -15,6 +16,18 @@ public class MiniJavaListenerImpl extends MiniJavaBaseListener {
     @Override
     public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
         System.out.println("VarDecl");
+    }
+
+    private Stack<Object> context = new Stack<>();
+
+    @Override
+    public void enterExpr(MiniJavaParser.ExprContext ctx) {
+        System.out.println("Expr: " + ctx.getText());
+    }
+
+    @Override
+    public void exitExpr(MiniJavaParser.ExprContext ctx) {
+        System.out.println("Expr: " + ctx.getText());
     }
 
     @Override

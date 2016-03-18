@@ -9,7 +9,7 @@ import java.io.IOException;
 public class Compiler {
     public static void main(String[] args) throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleParserTestcases/testcase00_09.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/OperatorParsePrecedence.java"));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);

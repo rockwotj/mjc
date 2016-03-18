@@ -19,20 +19,52 @@ ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
 whileDecl : 'while' '(' expr ')' stmt ;
 print : 'System.out.println' '(' expr')' ';' ;
 assigment : Id  '=' expr ';' ;
-expr : expr ('+' | '-' | '*' | '/' | '<' | '<=' | '>=' | '>' | '==' | '!=' | '&&' | '||') expr
-       | ( '-' | '!' ) expr
-       | expr '.' Id '(' expr (',' expr)* ')'
-       | 'new ' Id '()'
+
+
+expr : expr '.' Id '(' expr (',' expr)* ')'
+        | logicalOr;
+
+logicalOr : logicalAnd '||' logicalOr
+            | logicalAnd;
+
+logicalAnd : equalsOrNotEquals '&&' logicalAnd
+                | equalsOrNotEquals;
+
+equalsOrNotEquals : relation '==' equalsOrNotEquals
+            | relation '!=' equalsOrNotEquals
+            | relation;
+
+relation : plusOrMinus '<=' relation
+            | plusOrMinus '>=' relation
+            | plusOrMinus '>' relation
+            | plusOrMinus '<' relation
+            | plusOrMinus;
+
+plusOrMinus : multOrDiv '+' plusOrMinus
+        | multOrDiv '-' plusOrMinus
+        | multOrDiv ;
+
+multOrDiv : unary '*' multOrDiv
+        | unary '/' multOrDiv
+        | unary ;
+
+unary : '!' expr
+         | '-' expr
+         | atom;
+
+atom : Integer
        | Id
-       | 'this'
-       | Integer
-       | 'null'
        | 'true'
        | 'false'
-       | '(' expr ')' ;
+       | 'new ' Id '()'
+       | '(' expr ')'
+       | 'null'
+       | 'this';
+
 
 //fragment Program : (Token | Whitespace)* ;
 //Token : ID | Integer | ReservedWord | Operator | Delimiter ;
+
 ReservedWord : 'class' | 'public' | 'static' | 'extends' | 'void' | 'int' | 'boolean' | 'if' |
 'else' | 'while' | 'return' | 'null' | 'true' | 'false' | 'this' | 'new' |
 'String' | 'main' | 'System.out.println' ;
