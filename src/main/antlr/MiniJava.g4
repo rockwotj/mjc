@@ -1,27 +1,27 @@
 grammar MiniJava;
 
 program : mainClassDecl (classDecl)* ;
-mainClassDecl : 'class' Id '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' Id')' '{' (stmt)* '}' '}' ;
-classDecl : 'class' Id ('extends' Id)? '{' (classVarDecl)* (methodDecl)* '}' ;
-classVarDecl : type Id ';' ;
-methodDecl : 'public' type Id ('(' (formal (',' formal)*)? ')' | '()') '{' (stmt)* 'return' expr ';' '}' ;
-formal : type Id;
-type : 'int' | 'boolean' | Id ;
+mainClassDecl : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' ID')' '{' (stmt)* '}' '}' ;
+classDecl : 'class' ID ('extends' ID)? '{' (classVarDecl)* (methodDecl)* '}' ;
+classVarDecl : type ID ';' ;
+methodDecl : 'public' type ID ('(' (formal (',' formal)*)? ')' | '()') '{' (stmt)* 'return' expr ';' '}' ;
+formal : type ID;
+type : 'int' | 'boolean' | ID ;
 stmt :      varDecl
           | block
           | ifElse
           | whileDecl
           | print
           | assigment ;
-varDecl : type Id  '=' expr ';' ;
+varDecl : type ID  '=' expr ';' ;
 block : '{' (stmt)* '}' ;
 ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
 whileDecl : 'while' '(' expr ')' stmt ;
 print : 'System.out.println' '(' expr')' ';' ;
-assigment : Id  '=' expr ';' ;
+assigment : ID  '=' expr ';' ;
 
 
-expr : expr '.' Id '(' expr (',' expr)* ')'
+expr : expr '.' ID '(' expr (',' expr)* ')'
         | logicalOr;
 
 logicalOr : logicalAnd '||' logicalOr
@@ -40,23 +40,22 @@ relation : plusOrMinus '<=' relation
             | plusOrMinus '<' relation
             | plusOrMinus;
 
-plusOrMinus : multOrDiv '+' plusOrMinus
-        | multOrDiv '-' plusOrMinus
+plusOrMinus : multOrDiv PLUS plusOrMinus
+        | multOrDiv MINUS plusOrMinus
         | multOrDiv ;
 
 multOrDiv : unary '*' multOrDiv
         | unary '/' multOrDiv
         | unary ;
 
-unary : '!' expr
-         | '-' expr
+unary : BANG expr
+         | MINUS expr
          | atom;
 
-atom : Integer
-       | Id
-       | 'true'
-       | 'false'
-       | 'new ' Id '()'
+atom : INTEGER
+       | ID
+       | BOOL
+       | 'new ' ID '()'
        | '(' expr ')'
        | 'null'
        | 'this';
@@ -65,15 +64,19 @@ atom : Integer
 //fragment Program : (Token | Whitespace)* ;
 //Token : ID | Integer | ReservedWord | Operator | Delimiter ;
 
-ReservedWord : 'class' | 'public' | 'static' | 'extends' | 'void' | 'int' | 'boolean' | 'if' |
-'else' | 'while' | 'return' | 'null' | 'true' | 'false' | 'this' | 'new' |
-'String' | 'main' | 'System.out.println' ;
-Id : Letter (Letter | Digit)* ;
-Integer : NonZeroDigit Digit* | '0' ;
-Letter : [a-z] | [A-Z] ;
-Digit : [0-9] ;
-NonZeroDigit : [1-9] ;
-Operator : '+' | '-' | '*' | '/' | '<' | '<=' | '>=' | '>' | '==' | '!=' | '&&' | '||' | '!' ;
-Delimiter : ';' | '.' | ',' | '=' | '(' | ')' | '{' | '}' | '[' | ']' ;
+ID : LETTER (LETTER | DIGIT)* ;
+BOOL : TRUE | FALSE;
+TRUE : 'true';
+FALSE : 'false';
+INTEGER : NONZERODIGIT DIGIT* | '0' ;
+BANG: '!';
+MINUS: '-';
+PLUS: '+';
+
+LETTER : [a-z] | [A-Z] ;
+DIGIT : [0-9] ;
+NONZERODIGIT : [1-9] ;
+
+// Eat this stuff
 Whitespace : (' ' | '\t' | '\n' | '\r' | Comment) -> channel(HIDDEN);
 Comment : ('//' ~('\r' | '\n')* | '/*' .*? '*/') -> channel(HIDDEN);

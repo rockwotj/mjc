@@ -27,8 +27,8 @@ public class Compiler {
         // Walk parse tree and attach our listener
         ParseTreeWalker walker = new ParseTreeWalker();
         MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
-
-        walker.walk(listener, progContext);
+        ContextSenstiveAnalysis csa = new ContextSenstiveAnalysis();
+        walker.walk(csa, progContext);
     }
 
 }
