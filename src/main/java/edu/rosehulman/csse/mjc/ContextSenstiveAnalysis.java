@@ -9,108 +9,205 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
 
     @Override
     public void enterExpr(MiniJavaParser.ExprContext ctx) {
+        System.out.println("Enter Expr ");
     }
 
     @Override
     public void enterLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
-        super.enterLogicalOr(ctx);
+        System.out.print("Enter LogicalOr ");
+        if (ctx.OR() != null) {
+            System.out.println("OR: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterLogicalAnd(MiniJavaParser.LogicalAndContext ctx) {
-        super.enterLogicalAnd(ctx);
+        System.out.print("Enter LogicalAnd ");
+        if (ctx.AND() != null) {
+            System.out.println("AND: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
-        super.enterEqualsOrNotEquals(ctx);
+        System.out.print("Enter EqualsOrNotEquals ");
+        if (ctx.EEQ() != null) {
+            System.out.println("EEQ: " + ctx.getText());
+        } else if (ctx.NEQ() != null) {
+            System.out.println("NEQ: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterRelation(MiniJavaParser.RelationContext ctx) {
-        super.enterRelation(ctx);
+        System.out.print("Enter Relation ");
+        if (ctx.LEQ() != null) {
+            System.out.println("LEQ: " + ctx.getText());
+        } else if (ctx.GEQ() != null) {
+            System.out.println("GEQ: " + ctx.getText());
+        } else if (ctx.LT() != null) {
+            System.out.println("LT: " + ctx.getText());
+        } else if (ctx.GT() != null) {
+            System.out.println("GT: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
-        System.out.println("enterPlusOrMinus");
+        System.out.print("Enter PlusOrMinus ");
+        if (ctx.ADD() != null) {
+            System.out.println("ADD: " + ctx.getText());
+        } else if (ctx.SUB() != null) {
+            System.out.println("SUB: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterMultOrDiv(MiniJavaParser.MultOrDivContext ctx) {
-        System.out.println("enterMultOrDiv");
+        System.out.print("Enter MultOrDiv ");
+        if (ctx.MUL() != null) {
+            System.out.println("MUL: " + ctx.getText());
+        } else if (ctx.DIV() != null) {
+            System.out.println("DIV: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterUnary(MiniJavaParser.UnaryContext ctx) {
-        super.enterUnary(ctx);
+        System.out.print("Enter Unary ");
+        if (ctx.BANG() != null) {
+            System.out.println("BANG: " + ctx.getText());
+        } else if (ctx.NEGATIVE() != null) {
+            System.out.println("NEGATIVE: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void enterAtom(MiniJavaParser.AtomContext ctx) {
-        System.out.println("enterAtom");
+        System.out.print("Enter Atom ");
+        if (ctx.BOOL() != null) {
+            System.out.println("BOOL: " + ctx.getText());
+        } else if (ctx.INT() != null) {
+            System.out.println("INT: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitAtom(MiniJavaParser.AtomContext ctx) {
+        System.out.print("Exit Atom ");
         if (ctx.BOOL() != null) {
             System.out.println("BOOL: " + ctx.getText());
             resultantTypes.push(Boolean.class);
-        } else if (ctx.INTEGER() != null) {
+        } else if (ctx.INT() != null) {
             System.out.println("INT: " + ctx.getText());
-            resultantTypes.push(Integer.class);
         } else {
-            System.err.println("INVALID TYPE?!?!");
+            System.out.println("FALL THROUGH");
+            resultantTypes.push(Boolean.class);
         }
-        System.out.println("exitAtom");
     }
 
     @Override
     public void exitUnary(MiniJavaParser.UnaryContext ctx) {
-//        Type type = resultantTypes.peek();
-//        if (ctx.BANG() != null) {
-//            assert type.equals(Boolean.class);
-//        } else if (ctx.MINUS() != null) {
-//            assert type.equals(Integer.class);
-//        }
+        System.out.print("Exit Unary ");
+        if (ctx.BANG() != null) {
+            System.out.println("BANG: " + ctx.getText());
+        } else if (ctx.NEGATIVE() != null) {
+            System.out.println("NEGATIVE: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitMultOrDiv(MiniJavaParser.MultOrDivContext ctx) {
-//        Type type1 = resultantTypes.pop();
-//        Type type2 = resultantTypes.pop();
-//        assert type1.equals(type2) && type1.equals(Integer.class);
-//        resultantTypes.push(Integer.class);
-        System.out.println("exitMultOrDiv");
+        System.out.print("Exit MultOrDiv ");
+        if (ctx.MUL() != null) {
+            System.out.println("MUL: " + ctx.getText());
+        } else if (ctx.DIV() != null) {
+            System.out.println("DIV: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
-
+        System.out.print("Exit PlusOrMinus ");
+        if (ctx.ADD() != null) {
+            System.out.println("ADD: " + ctx.getText());
+        } else if (ctx.SUB() != null) {
+            System.out.println("SUB: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitRelation(MiniJavaParser.RelationContext ctx) {
-        super.exitRelation(ctx);
+        System.out.print("Exit Relation ");
+        if (ctx.LEQ() != null) {
+            System.out.println("LEQ: " + ctx.getText());
+        } else if (ctx.GEQ() != null) {
+            System.out.println("GEQ: " + ctx.getText());
+        } else if (ctx.LT() != null) {
+            System.out.println("LT: " + ctx.getText());
+        } else if (ctx.GT() != null) {
+            System.out.println("GT: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
-        super.exitEqualsOrNotEquals(ctx);
+        System.out.print("Exit EqualsOrNotEquals ");
+        if (ctx.EEQ() != null) {
+            System.out.println("EEQ: " + ctx.getText());
+        } else if (ctx.NEQ() != null) {
+            System.out.println("NEQ: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitLogicalAnd(MiniJavaParser.LogicalAndContext ctx) {
-        super.exitLogicalAnd(ctx);
+        System.out.print("Exit LogicalAnd ");
+        if (ctx.AND() != null) {
+            System.out.println("AND: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
-        super.exitLogicalOr(ctx);
+        System.out.print("Exit LogicalOr ");
+        if (ctx.OR() != null) {
+            System.out.println("OR: " + ctx.getText());
+        } else {
+            System.out.println("FALL THROUGH");
+        }
     }
 
     @Override
     public void exitExpr(MiniJavaParser.ExprContext ctx) {
-        super.exitExpr(ctx);
+        System.out.println("Exit Expr ");
     }
 }
