@@ -55,21 +55,17 @@ unary :
 
 atom :
       INT
-    | ID
     | BOOL
     | NULL
     | THIS
     | NEW ID LPAREN RPAREN
+    | ID
     | LPAREN expr RPAREN ;
 
 // Reserved Words
 NULL : 'null' ;
 THIS : 'this' ;
 NEW  : 'new' ;
-
-// Identifier
-ID : LETTER (LETTER | DIGIT)* ;
-LETTER : [a-z] | [A-Z] ;
 
 // Types
 INT   : NONZERODIGIT DIGIT* | '0' ;
@@ -78,6 +74,10 @@ NONZERODIGIT : [1-9] ;
 BOOL  : TRUE | FALSE ;
 FALSE : 'false' ;
 TRUE  : 'true' ;
+
+// Identifier
+ID : LETTER (LETTER | DIGIT)* ;
+LETTER : [a-z] | [A-Z] ;
 
 // Logic operators
 AND : '&&' ;

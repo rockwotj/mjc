@@ -8,8 +8,19 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
     Stack<Type> resultantTypes = new Stack<>();
 
     @Override
+    public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
+        resultantTypes.clear();
+    }
+
+    @Override
+    public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
+        resultantTypes.clear();
+    }
+
+    @Override
     public void enterExpr(MiniJavaParser.ExprContext ctx) {
         System.out.println("Enter Expr ");
+        System.out.println(resultantTypes.toString());
     }
 
     @Override
@@ -103,6 +114,8 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
             System.out.println("BOOL: " + ctx.getText());
         } else if (ctx.INT() != null) {
             System.out.println("INT: " + ctx.getText());
+        } else if (ctx.ID() != null) {
+            System.out.println("ID: " + ctx.getText());
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -116,10 +129,11 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
             resultantTypes.push(Boolean.class);
         } else if (ctx.INT() != null) {
             System.out.println("INT: " + ctx.getText());
+            resultantTypes.push(Integer.class);
         } else {
             System.out.println("FALL THROUGH");
-            resultantTypes.push(Boolean.class);
         }
+        System.out.println(resultantTypes.toString());
     }
 
     @Override
@@ -127,8 +141,14 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit Unary ");
         if (ctx.BANG() != null) {
             System.out.println("BANG: " + ctx.getText());
+            if (Boolean.class != resultantTypes.peek()) {
+                System.err.println("Invalid type for ! operator, expected bool got int");
+            }
         } else if (ctx.NEGATIVE() != null) {
             System.out.println("NEGATIVE: " + ctx.getText());
+            if (Integer.class != resultantTypes.peek()) {
+                System.err.println("Invalid type for - operator, expected int got bool");
+            }
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -139,8 +159,13 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit MultOrDiv ");
         if (ctx.MUL() != null) {
             System.out.println("MUL: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
+            System.out.println(resultantTypes.toString());
         } else if (ctx.DIV() != null) {
             System.out.println("DIV: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -151,8 +176,12 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit PlusOrMinus ");
         if (ctx.ADD() != null) {
             System.out.println("ADD: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else if (ctx.SUB() != null) {
             System.out.println("SUB: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -163,12 +192,20 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit Relation ");
         if (ctx.LEQ() != null) {
             System.out.println("LEQ: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else if (ctx.GEQ() != null) {
             System.out.println("GEQ: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else if (ctx.LT() != null) {
             System.out.println("LT: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else if (ctx.GT() != null) {
             System.out.println("GT: " + ctx.getText());
+            assert Integer.class == resultantTypes.pop();
+            assert Integer.class == resultantTypes.peek();
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -179,8 +216,12 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit EqualsOrNotEquals ");
         if (ctx.EEQ() != null) {
             System.out.println("EEQ: " + ctx.getText());
+            assert Boolean.class == resultantTypes.pop();
+            assert Boolean.class == resultantTypes.peek();
         } else if (ctx.NEQ() != null) {
             System.out.println("NEQ: " + ctx.getText());
+            assert Boolean.class == resultantTypes.pop();
+            assert Boolean.class == resultantTypes.peek();
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -191,6 +232,8 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit LogicalAnd ");
         if (ctx.AND() != null) {
             System.out.println("AND: " + ctx.getText());
+            assert Boolean.class == resultantTypes.pop();
+            assert Boolean.class == resultantTypes.peek();
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -201,6 +244,8 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit LogicalOr ");
         if (ctx.OR() != null) {
             System.out.println("OR: " + ctx.getText());
+            assert Boolean.class == resultantTypes.pop();
+            assert Boolean.class == resultantTypes.peek();
         } else {
             System.out.println("FALL THROUGH");
         }
