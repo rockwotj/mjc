@@ -1,7 +1,7 @@
 
 class OperatorTest {
     public static void main(String[] args) {
-        boolean bool = -false;
+        boolean bool = -1 == true;
 //        int aa = 1 * false;
 //        int a = 1 * 2 + 3;
 //        int b = 1 + 2 * 3;

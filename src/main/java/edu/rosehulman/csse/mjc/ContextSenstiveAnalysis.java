@@ -36,7 +36,6 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
     @Override
     public void enterExpr(MiniJavaParser.ExprContext ctx) {
         System.out.println("Enter Expr ");
-        System.out.println(resultantTypes.toString());
     }
 
     @Override
@@ -149,7 +148,6 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         } else {
             System.out.println("FALL THROUGH");
         }
-        System.out.println(resultantTypes.toString());
     }
 
     @Override
@@ -157,14 +155,16 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit Unary ");
         if (ctx.BANG() != null) {
             System.out.println("BANG: " + ctx.getText());
-            if (Boolean.class != resultantTypes.peek()) {
-                System.err.println("Invalid type for ! operator, expected bool got int");
+            if (Boolean.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for ! operator, expected bool");
             }
+            resultantTypes.push(Boolean.class);
         } else if (ctx.NEGATIVE() != null) {
             System.out.println("NEGATIVE: " + ctx.getText());
-            if (Integer.class != resultantTypes.peek()) {
-                System.err.println("Invalid type for - operator, expected int got bool");
+            if (Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for - operator, expected int");
             }
+            resultantTypes.push(Integer.class);
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -175,13 +175,18 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit MultOrDiv ");
         if (ctx.MUL() != null) {
             System.out.println("MUL: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
-            System.out.println(resultantTypes.toString());
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for * operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else if (ctx.DIV() != null) {
             System.out.println("DIV: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for / operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -192,12 +197,18 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit PlusOrMinus ");
         if (ctx.ADD() != null) {
             System.out.println("ADD: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for + operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else if (ctx.SUB() != null) {
             System.out.println("SUB: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for / operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -208,20 +219,32 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit Relation ");
         if (ctx.LEQ() != null) {
             System.out.println("LEQ: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for <= operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else if (ctx.GEQ() != null) {
             System.out.println("GEQ: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for >= operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else if (ctx.LT() != null) {
             System.out.println("LT: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for < operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else if (ctx.GT() != null) {
             System.out.println("GT: " + ctx.getText());
-            assert Integer.class == resultantTypes.pop();
-            assert Integer.class == resultantTypes.peek();
+            if (Integer.class != resultantTypes.pop() ||
+                Integer.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for > operator, expected int");
+            }
+            resultantTypes.push(Integer.class);
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -230,14 +253,17 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
     @Override
     public void exitEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
         System.out.print("Exit EqualsOrNotEquals ");
+        // TODO: Can compare object pointers
         if (ctx.EEQ() != null) {
             System.out.println("EEQ: " + ctx.getText());
-            assert Boolean.class == resultantTypes.pop();
-            assert Boolean.class == resultantTypes.peek();
+            if (resultantTypes.pop() != resultantTypes.peek()) {
+                System.err.println("Mismatched types for == operator");
+            }
         } else if (ctx.NEQ() != null) {
             System.out.println("NEQ: " + ctx.getText());
-            assert Boolean.class == resultantTypes.pop();
-            assert Boolean.class == resultantTypes.peek();
+            if (resultantTypes.pop() != resultantTypes.peek()) {
+                System.err.println("Mismatched types for != operator");
+            }
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -248,8 +274,11 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit LogicalAnd ");
         if (ctx.AND() != null) {
             System.out.println("AND: " + ctx.getText());
-            assert Boolean.class == resultantTypes.pop();
-            assert Boolean.class == resultantTypes.peek();
+            if (Boolean.class != resultantTypes.pop() ||
+                Boolean.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for && operator, expected bool");
+            }
+            resultantTypes.push(Boolean.class);
         } else {
             System.out.println("FALL THROUGH");
         }
@@ -260,8 +289,11 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         System.out.print("Exit LogicalOr ");
         if (ctx.OR() != null) {
             System.out.println("OR: " + ctx.getText());
-            assert Boolean.class == resultantTypes.pop();
-            assert Boolean.class == resultantTypes.peek();
+            if (Boolean.class != resultantTypes.pop() ||
+                Boolean.class != resultantTypes.pop()) {
+                System.err.println("Invalid type for || operator, expected bool");
+            }
+            resultantTypes.push(Boolean.class);
         } else {
             System.out.println("FALL THROUGH");
         }
