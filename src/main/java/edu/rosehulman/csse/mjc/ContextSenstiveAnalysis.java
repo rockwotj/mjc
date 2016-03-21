@@ -237,21 +237,17 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
     @Override
     public void exitEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
         System.out.print("Exit EqualsOrNotEquals ");
-        // TODO: Can compare any types
+        // TODO: Can compare object pointers
         if (ctx.EEQ() != null) {
             System.out.println("EEQ: " + ctx.getText());
-            if (Boolean.class != resultantTypes.pop() ||
-                Boolean.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for == operator, expected bool");
+            if (resultantTypes.pop() != resultantTypes.peek()) {
+                System.err.println("Mismatched types for == operator");
             }
-            resultantTypes.push(Boolean.class);
         } else if (ctx.NEQ() != null) {
             System.out.println("NEQ: " + ctx.getText());
-            if (Boolean.class != resultantTypes.pop() ||
-                Boolean.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for != operator, expected bool");
+            if (resultantTypes.pop() != resultantTypes.peek()) {
+                System.err.println("Mismatched types for != operator");
             }
-            resultantTypes.push(Boolean.class);
         } else {
             System.out.println("FALL THROUGH");
         }
