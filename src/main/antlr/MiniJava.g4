@@ -91,8 +91,8 @@ EEQ : '==' ;
 NEQ : '!=' ;
 LEQ : '<=' ;
 GEQ : '>=' ;
-LT  : '<=' ;
-GT  : '>=' ;
+LT  : '<' ;
+GT  : '>' ;
 
 // Unary operators
 BANG : '!' ;
