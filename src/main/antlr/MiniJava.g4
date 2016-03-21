@@ -6,7 +6,7 @@ classDecl : 'class' ID ('extends' ID)? '{' (classVarDecl)* (methodDecl)* '}' ;
 classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID ('(' (formal (',' formal)*)? ')' | '()') '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
-type : 'int' | 'boolean' | ID ;
+type : INT_TYPE | BOOL_TYPE | ID ;
 stmt :
       varDecl
     | block
@@ -21,9 +21,10 @@ whileDecl : 'while' '(' expr ')' stmt ;
 print : 'System.out.println' '(' expr')' ';' ;
 assigment : ID  '=' expr ';' ;
 
-expr :
-      expr DOT ID LPAREN expr (COMMA expr)* RPAREN
-    | logicalOr ;
+expr : logicalOr exprPrime ;
+
+exprPrime: DOT ID LPAREN expr (COMMA expr)* RPAREN exprPrime
+    | /* epsilon */ ;
 
 logicalOr :
       logicalAnd OR logicalOr
@@ -66,6 +67,8 @@ atom :
 NULL : 'null' ;
 THIS : 'this' ;
 NEW  : 'new' ;
+BOOL_TYPE : 'boolean';
+INT_TYPE : 'int';
 
 // Types
 INT   : NONZERODIGIT DIGIT* | '0' ;
