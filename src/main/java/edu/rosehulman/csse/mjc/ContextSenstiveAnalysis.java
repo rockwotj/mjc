@@ -1,20 +1,36 @@
 package edu.rosehulman.csse.mjc;
 
+import edu.rosehulman.csse.mjc.ast.ParseTreeNode;
+
 import java.lang.reflect.Type;
 import java.util.Stack;
 
 public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
 
-    Stack<Type> resultantTypes = new Stack<>();
+    private Stack<Type> resultantTypes = new Stack<>();
+    private ParseTreeNode<MiniJavaParser.ProgramContext> parseTree;
+    private ParseTreeNode currentNode;
+
+    @Override
+    public void enterProgram(MiniJavaParser.ProgramContext ctx) {
+        parseTree = new ParseTreeNode<>(ctx);
+        currentNode = parseTree;
+    }
 
     @Override
     public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
         resultantTypes.clear();
+        ParseTreeNode<MiniJavaParser.VarDeclContext> child = new ParseTreeNode<>(ctx);
+        currentNode.addChild(child);
+        currentNode = child;
     }
 
     @Override
     public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
         resultantTypes.clear();
+        ParseTreeNode<MiniJavaParser.AssigmentContext> child = new ParseTreeNode<>(ctx);
+        currentNode.addChild(child);
+        currentNode = child;
     }
 
     @Override
@@ -255,4 +271,10 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
     public void exitExpr(MiniJavaParser.ExprContext ctx) {
         System.out.println("Exit Expr ");
     }
+
+
+    public ParseTreeNode<MiniJavaParser.ProgramContext> getParseTree() {
+        return parseTree;
+    }
+
 }

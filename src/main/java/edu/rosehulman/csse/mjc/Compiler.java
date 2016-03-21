@@ -22,13 +22,16 @@ public class Compiler {
         parser.addErrorListener(errorListener);
 
         // Specify parser grammer entry point
-        MiniJavaParser.ProgramContext progContext = parser.program();
+        MiniJavaParser.ProgramContext parseTreeRoot = parser.program();
 
         // Walk parse tree and attach our listener
         ParseTreeWalker walker = new ParseTreeWalker();
-        MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
-        ContextSenstiveAnalysis csa = new ContextSenstiveAnalysis();
-        walker.walk(csa, progContext);
+//        MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
+//        ContextSenstiveAnalysis csa = new ContextSenstiveAnalysis();
+//        walker.walk(vistor, parseTreeRoot);
+        ContextSenstiveAnalysisVistor vistor = new ContextSenstiveAnalysisVistor();
+        vistor.visit(parseTreeRoot);
+
     }
 
 }

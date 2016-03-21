@@ -30,7 +30,7 @@ ReservedWord, void
 ID, fill
 Delimiter, (
 ID, double
-ID, value
+ID, context
 Delimiter, ,
 ID, double
 ID, weight

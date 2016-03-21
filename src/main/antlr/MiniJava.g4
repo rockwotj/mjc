@@ -7,8 +7,7 @@ classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID ('(' (formal (',' formal)*)? ')' | '()') '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
 type : INT_TYPE | BOOL_TYPE | ID ;
-stmt :
-      varDecl
+stmt : varDecl
     | block
     | ifElse
     | whileDecl
