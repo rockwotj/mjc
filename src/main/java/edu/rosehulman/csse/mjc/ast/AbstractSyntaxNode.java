@@ -9,12 +9,53 @@ import java.util.stream.Collectors;
 public class AbstractSyntaxNode<T extends ParserRuleContext> {
 
     protected T context;
+    protected final NodeType type;
 
     protected List<AbstractSyntaxNode> children = new ArrayList<>();
 
 
-    public AbstractSyntaxNode(T context) {
+    public enum NodeType {
+        program,
+        mainClassDecl,
+        classDecl,
+        classVarDecl,
+        methodDecl,
+        formal,
+        type,
+        stmt,
+        varDecl,
+        block,
+        ifElse,
+        whileDecl,
+        print,
+        assigment,
+        expr,
+        logicalOr,
+        logicalAnd,
+        equals,
+        notEquals,
+        lessThan,
+        greaterThan,
+        lessThanEquals,
+        greaterThanEquals,
+        plus,
+        minus,
+        mult,
+        div,
+        bang,
+        negative,
+        integer,
+        bool,
+        nil,
+        self,
+        id,
+        constructor
+    }
+
+
+    public AbstractSyntaxNode(T context, NodeType type) {
         this.context = context;
+        this.type = type;
     }
 
     public void addChild(AbstractSyntaxNode child) {
@@ -27,6 +68,10 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
 
     public T getContext() {
         return context;
+    }
+
+    public NodeType getType() {
+        return type;
     }
 
     @Override

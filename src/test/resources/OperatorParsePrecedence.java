@@ -19,5 +19,17 @@ class OperatorTest {
         while ( a ) {
             int x = 1 + 2;
         }
+        FacMethod mthd = new FacMethod ( );
+        while (true) {
+
+        }
+        while (
+                true
+                )
+
+        {
+
+        }
+        while(true){}
     }
 }
