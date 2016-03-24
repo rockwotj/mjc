@@ -20,10 +20,9 @@ whileDecl : 'while' '(' expr ')' stmt ;
 print : 'System.out.println' '(' expr')' ';' ;
 assigment : ID  '=' expr ';' ;
 
-expr : logicalOr exprPrime ;
+expr : logicalOr (exprPrime)*;
 
-exprPrime: DOT ID LPAREN expr (COMMA expr)* RPAREN exprPrime
-    | /* epsilon */ ;
+exprPrime: DOT ID LPAREN expr (COMMA expr)* RPAREN ;
 
 logicalOr :
       logicalAnd OR logicalOr
@@ -50,7 +49,7 @@ multOrDiv :
     | unary ;
 
 unary :
-      (BANG|NEGATIVE) expr
+      (BANG|SUB) expr
     | atom ;
 
 atom :
@@ -93,15 +92,15 @@ GEQ : '>=' ;
 LT  : '<' ;
 GT  : '>' ;
 
-// Unary operators
-BANG : '!' ;
-NEGATIVE : '-' ;
-
 // Arithmetic operators
 ADD : '+' ;
 SUB : '-' ;
 MUL : '*' ;
 DIV : '/' ;
+
+// Unary operators
+BANG : '!' ;
+//NEGATIVE : SUB ;
 
 // Delimeters
 LPAREN : '(' ;

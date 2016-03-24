@@ -261,7 +261,7 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
         AbstractSyntaxNode node = null;
         if (ctx.BANG() != null) {
             node = new AbstractSyntaxNode<>(ctx, NodeType.bang);
-        } else if (ctx.NEGATIVE() != null) {
+        } else if (ctx.SUB() != null) {
             node = new AbstractSyntaxNode<>(ctx, NodeType.negative);
         }
         if (node != null) {
@@ -303,7 +303,7 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
 
     @Override
     public void exitUnary(MiniJavaParser.UnaryContext ctx) {
-        if (ctx.BANG() != null || ctx.NEGATIVE() != null) {
+        if (ctx.BANG() != null || ctx.SUB() != null) {
             currentNode = parents.pop();
         }
     }
