@@ -52,4 +52,4 @@ multOrDiv -> unary * multOrDiv | unary / multOrDiv | unary
 
 unary -> ! expr | - expr | atom
 
-// atom -> INT | BOOL | null | this | new ID ( ) | ID | ( expr ) ;
+atom -> INT | BOOL | null | this | new ID ( ) | ID | ( expr )
