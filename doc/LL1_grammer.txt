@@ -4,7 +4,7 @@ program : mainClassDecl (classDecl)* ;
 mainClassDecl : 'class' ID '{' 'public' 'static' 'void' 'main' '(' 'String' '[' ']' ID')' '{' (stmt)* '}' '}' ;
 classDecl : 'class' ID ('extends' ID)? '{' (classVarDecl)* (methodDecl)* '}' ;
 classVarDecl : type ID ';' ;
-methodDecl : 'public' type ID ('(' (formal (',' formal)*)? ')' | '()') '{' (stmt)* 'return' expr ';' '}' ;
+methodDecl : 'public' type ID (LPAREN (formal (',' formal)*)? RPAREN | PAREN) '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
 type : INT_TYPE | BOOL_TYPE | ID ;
 stmt : varDecl
@@ -58,7 +58,7 @@ atom :
     | BOOL
     | NULL
     | THIS
-    | NEW ID LPAREN RPAREN
+    | NEW ID (PAREN | LPAREN RPAREN)
     | ID
     | LPAREN expr RPAREN ;
 
@@ -106,6 +106,7 @@ DIV : '/' ;
 // Delimeters
 LPAREN : '(' ;
 RPAREN : ')' ;
+PAREN  : '()';
 DOT    : '.' ;
 COMMA  : ',' ;
 
