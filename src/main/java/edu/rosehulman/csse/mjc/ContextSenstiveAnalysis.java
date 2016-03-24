@@ -1,312 +1,361 @@
 package edu.rosehulman.csse.mjc;
 
-import edu.rosehulman.csse.mjc.ast.ParseTreeNode;
+import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.tree.ErrorNode;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.lang.reflect.Type;
 import java.util.Stack;
 
 public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
 
-    private Stack<Type> resultantTypes = new Stack<>();
-    private ParseTreeNode<MiniJavaParser.ProgramContext> parseTree;
-    private ParseTreeNode currentNode;
+    private Stack<AbstractSyntaxNode> parents = new Stack<>();
+    private AbstractSyntaxNode<MiniJavaParser.ProgramContext> parseTree;
+    private AbstractSyntaxNode currentNode;
 
     @Override
     public void enterProgram(MiniJavaParser.ProgramContext ctx) {
-        parseTree = new ParseTreeNode<>(ctx);
+        parseTree = new AbstractSyntaxNode<>(ctx);
         currentNode = parseTree;
     }
 
     @Override
+    public void exitProgram(MiniJavaParser.ProgramContext ctx) {
+    }
+
+    @Override
+    public void enterMainClassDecl(MiniJavaParser.MainClassDeclContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+
+    @Override
+    public void exitMainClassDecl(MiniJavaParser.MainClassDeclContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterClassDecl(MiniJavaParser.ClassDeclContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitClassDecl(MiniJavaParser.ClassDeclContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterClassVarDecl(MiniJavaParser.ClassVarDeclContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitClassVarDecl(MiniJavaParser.ClassVarDeclContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterMethodDecl(MiniJavaParser.MethodDeclContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitMethodDecl(MiniJavaParser.MethodDeclContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterFormal(MiniJavaParser.FormalContext ctx) {
+    }
+
+    @Override
+    public void exitFormal(MiniJavaParser.FormalContext ctx) {
+
+    }
+
+    @Override
+    public void enterType(MiniJavaParser.TypeContext ctx) {
+    }
+
+    @Override
+    public void exitType(MiniJavaParser.TypeContext ctx) {
+
+    }
+
+    @Override
     public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
-        resultantTypes.clear();
-        ParseTreeNode<MiniJavaParser.VarDeclContext> child = new ParseTreeNode<>(ctx);
-        currentNode.addChild(child);
-        currentNode = child;
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitVarDecl(MiniJavaParser.VarDeclContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterBlock(MiniJavaParser.BlockContext ctx) {
+
+    }
+
+    @Override
+    public void exitBlock(MiniJavaParser.BlockContext ctx) {
+
+    }
+
+    @Override
+    public void enterIfElse(MiniJavaParser.IfElseContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitIfElse(MiniJavaParser.IfElseContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
+        currentNode = parents.pop();
+    }
+
+    @Override
+    public void enterPrint(MiniJavaParser.PrintContext ctx) {
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitPrint(MiniJavaParser.PrintContext ctx) {
+        currentNode = parents.pop();
     }
 
     @Override
     public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
-        resultantTypes.clear();
-        ParseTreeNode<MiniJavaParser.AssigmentContext> child = new ParseTreeNode<>(ctx);
-        currentNode.addChild(child);
-        currentNode = child;
+        parents.push(currentNode);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+        currentNode.addChild(node);
+        currentNode = node;
+    }
+
+    @Override
+    public void exitAssigment(MiniJavaParser.AssigmentContext ctx) {
+        currentNode = parents.pop();
     }
 
     @Override
     public void enterExpr(MiniJavaParser.ExprContext ctx) {
-        System.out.println("Enter Expr ");
+
     }
 
     @Override
     public void enterLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
-        System.out.print("Enter LogicalOr ");
         if (ctx.OR() != null) {
-            System.out.println("OR: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
+
     }
 
     @Override
     public void enterLogicalAnd(MiniJavaParser.LogicalAndContext ctx) {
-        System.out.print("Enter LogicalAnd ");
         if (ctx.AND() != null) {
-            System.out.println("AND: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
     }
 
     @Override
     public void enterEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
-        System.out.print("Enter EqualsOrNotEquals ");
-        if (ctx.EEQ() != null) {
-            System.out.println("EEQ: " + ctx.getText());
-        } else if (ctx.NEQ() != null) {
-            System.out.println("NEQ: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.EEQ() != null || ctx.NEQ() != null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
     }
 
     @Override
     public void enterRelation(MiniJavaParser.RelationContext ctx) {
-        System.out.print("Enter Relation ");
-        if (ctx.LEQ() != null) {
-            System.out.println("LEQ: " + ctx.getText());
-        } else if (ctx.GEQ() != null) {
-            System.out.println("GEQ: " + ctx.getText());
-        } else if (ctx.LT() != null) {
-            System.out.println("LT: " + ctx.getText());
-        } else if (ctx.GT() != null) {
-            System.out.println("GT: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.LEQ() != null || ctx.GEQ() != null || ctx.LT() != null || ctx.GT() != null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
     }
 
     @Override
     public void enterPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
-        System.out.print("Enter PlusOrMinus ");
-        if (ctx.ADD() != null) {
-            System.out.println("ADD: " + ctx.getText());
-        } else if (ctx.SUB() != null) {
-            System.out.println("SUB: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.ADD() != null || ctx.SUB() != null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
     }
 
     @Override
     public void enterMultOrDiv(MiniJavaParser.MultOrDivContext ctx) {
-        System.out.print("Enter MultOrDiv ");
-        if (ctx.MUL() != null) {
-            System.out.println("MUL: " + ctx.getText());
-        } else if (ctx.DIV() != null) {
-            System.out.println("DIV: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.MUL() != null || ctx.DIV() != null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
     }
 
     @Override
     public void enterUnary(MiniJavaParser.UnaryContext ctx) {
-        System.out.print("Enter Unary ");
-        if (ctx.BANG() != null) {
-            System.out.println("BANG: " + ctx.getText());
-        } else if (ctx.NEGATIVE() != null) {
-            System.out.println("NEGATIVE: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.BANG() != null || ctx.NEGATIVE() != null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
+
     }
 
     @Override
     public void enterAtom(MiniJavaParser.AtomContext ctx) {
-        System.out.print("Enter Atom ");
-        if (ctx.BOOL() != null) {
-            System.out.println("BOOL: " + ctx.getText());
-        } else if (ctx.INT() != null) {
-            System.out.println("INT: " + ctx.getText());
-        } else if (ctx.ID() != null) {
-            System.out.println("ID: " + ctx.getText());
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.expr() == null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
         }
     }
 
     @Override
     public void exitAtom(MiniJavaParser.AtomContext ctx) {
-        System.out.print("Exit Atom ");
-        if (ctx.BOOL() != null) {
-            System.out.println("BOOL: " + ctx.getText());
-            resultantTypes.push(Boolean.class);
-        } else if (ctx.INT() != null) {
-            System.out.println("INT: " + ctx.getText());
-            resultantTypes.push(Integer.class);
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.expr() == null) {
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitUnary(MiniJavaParser.UnaryContext ctx) {
-        System.out.print("Exit Unary ");
-        if (ctx.BANG() != null) {
-            System.out.println("BANG: " + ctx.getText());
-            if (Boolean.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for ! operator, expected bool");
-            }
-            resultantTypes.push(Boolean.class);
-        } else if (ctx.NEGATIVE() != null) {
-            System.out.println("NEGATIVE: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for - operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.BANG() != null || ctx.NEGATIVE() != null) {
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitMultOrDiv(MiniJavaParser.MultOrDivContext ctx) {
-        System.out.print("Exit MultOrDiv ");
-        if (ctx.MUL() != null) {
-            System.out.println("MUL: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for * operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else if (ctx.DIV() != null) {
-            System.out.println("DIV: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for / operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.MUL() != null || ctx.DIV() != null) {
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
-        System.out.print("Exit PlusOrMinus ");
-        if (ctx.ADD() != null) {
-            System.out.println("ADD: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for + operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else if (ctx.SUB() != null) {
-            System.out.println("SUB: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for / operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.ADD() != null || ctx.SUB() != null) {
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitRelation(MiniJavaParser.RelationContext ctx) {
-        System.out.print("Exit Relation ");
-        if (ctx.LEQ() != null) {
-            System.out.println("LEQ: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for <= operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else if (ctx.GEQ() != null) {
-            System.out.println("GEQ: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for >= operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else if (ctx.LT() != null) {
-            System.out.println("LT: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for < operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else if (ctx.GT() != null) {
-            System.out.println("GT: " + ctx.getText());
-            if (Integer.class != resultantTypes.pop() ||
-                Integer.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for > operator, expected int");
-            }
-            resultantTypes.push(Integer.class);
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.LEQ() != null || ctx.GEQ() != null || ctx.LT() != null || ctx.GT() != null) {
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
-        System.out.print("Exit EqualsOrNotEquals ");
-        // TODO: Can compare object pointers
-        if (ctx.EEQ() != null) {
-            System.out.println("EEQ: " + ctx.getText());
-            if (resultantTypes.pop() != resultantTypes.peek()) {
-                System.err.println("Mismatched types for == operator");
-            }
-        } else if (ctx.NEQ() != null) {
-            System.out.println("NEQ: " + ctx.getText());
-            if (resultantTypes.pop() != resultantTypes.peek()) {
-                System.err.println("Mismatched types for != operator");
-            }
-        } else {
-            System.out.println("FALL THROUGH");
+        if (ctx.EEQ() != null || ctx.NEQ() != null) {
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitLogicalAnd(MiniJavaParser.LogicalAndContext ctx) {
-        System.out.print("Exit LogicalAnd ");
         if (ctx.AND() != null) {
-            System.out.println("AND: " + ctx.getText());
-            if (Boolean.class != resultantTypes.pop() ||
-                Boolean.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for && operator, expected bool");
-            }
-            resultantTypes.push(Boolean.class);
-        } else {
-            System.out.println("FALL THROUGH");
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
-        System.out.print("Exit LogicalOr ");
         if (ctx.OR() != null) {
-            System.out.println("OR: " + ctx.getText());
-            if (Boolean.class != resultantTypes.pop() ||
-                Boolean.class != resultantTypes.pop()) {
-                System.err.println("Invalid type for || operator, expected bool");
-            }
-            resultantTypes.push(Boolean.class);
-        } else {
-            System.out.println("FALL THROUGH");
+            currentNode = parents.pop();
         }
     }
 
     @Override
     public void exitExpr(MiniJavaParser.ExprContext ctx) {
-        System.out.println("Exit Expr ");
+
+    }
+
+    @Override
+    public void enterExprPrime(MiniJavaParser.ExprPrimeContext ctx) {
+        if (ctx.ID() != null) {
+            parents.push(currentNode);
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx);
+            currentNode.addChild(node);
+            currentNode = node;
+        }
+    }
+
+    @Override
+    public void exitExprPrime(MiniJavaParser.ExprPrimeContext ctx) {
+        if (ctx.ID() != null) {
+            currentNode = parents.pop();
+        }
     }
 
 
-    public ParseTreeNode<MiniJavaParser.ProgramContext> getParseTree() {
+    public AbstractSyntaxNode<MiniJavaParser.ProgramContext> getParseTree() {
         return parseTree;
     }
 
+    @Override
+    public void visitTerminal(TerminalNode node) {
+
+    }
+
+    @Override
+    public void visitErrorNode(ErrorNode node) {
+
+    }
+
+    @Override
+    public void enterEveryRule(ParserRuleContext ctx) {
+
+    }
+
+    @Override
+    public void exitEveryRule(ParserRuleContext ctx) {
+
+    }
 }
