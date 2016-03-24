@@ -11,7 +11,7 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
     protected T context;
     protected final NodeType type;
 
-    protected List<AbstractSyntaxNode> children = new ArrayList<>();
+    protected List<AbstractSyntaxNode<ParserRuleContext>> children = new ArrayList<>();
 
 
     public enum NodeType {
@@ -58,11 +58,11 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
         this.type = type;
     }
 
-    public void addChild(AbstractSyntaxNode child) {
+    public void addChild(AbstractSyntaxNode<ParserRuleContext> child) {
         children.add(child);
     }
 
-    public List<AbstractSyntaxNode> getChildren() {
+    public List<AbstractSyntaxNode<ParserRuleContext>> getChildren() {
         return children;
     }
 
