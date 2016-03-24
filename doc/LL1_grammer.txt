@@ -46,3 +46,10 @@ equalsOrNotEquals -> relation == equalsOrNotEquals | relation != equalsOrNotEqua
 
 relation -> plusOrMinus =< relation | plusOrMinus >= relation | plusOrMinus > relation | plusOrMinus < relation | plusOrMinus
 
+plusOrMinus -> multOrDiv + plusOrMinus | multOrDiv - plusOrMinus | multOrDiv
+
+multOrDiv -> unary * multOrDiv | unary / multOrDiv | unary
+
+unary -> ! expr | - expr | atom
+
+// atom -> INT | BOOL | null | this | new ID ( ) | ID | ( expr ) ;
