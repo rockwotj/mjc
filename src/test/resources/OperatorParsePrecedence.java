@@ -17,6 +17,7 @@ class OperatorTest {
         boolean z =  false && (5 > 1 * -3 || true);
         FacMethod mthd = new FacMethod( );
         FacMethod mthd = new FacMethod();
+        boolean z = 5 == false;
         while ( a ) {
             int x = 1 + 2;
         }

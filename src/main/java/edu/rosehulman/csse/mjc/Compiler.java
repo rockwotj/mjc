@@ -29,6 +29,9 @@ public class Compiler {
         ContextSenstiveAnalysis csa = new ContextSenstiveAnalysis();
         walker.walk(csa, parseTreeRoot);
         System.out.println(csa.getParseTree().toString());
-    }
 
+        // Type checking
+        TypeChecker typeCheckingWalker = new TypeChecker(csa.getParseTree());
+        typeCheckingWalker.walk();
+    }
 }
