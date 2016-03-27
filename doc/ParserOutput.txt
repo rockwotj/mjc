@@ -1,0 +1,302 @@
+FILENAME: testcase00_09.java
+STANDARD_OUT
+    VarDecl
+    VarDecl
+    WhileDecl
+    Print
+    VarDecl
+    IfElse
+    Assigment
+    Assigment
+    VarDecl
+    Print
+
+FILENAME: testcase01_04.java
+STANDARD_ERROR
+    line 3:2 mismatched input 'public' expecting {'{', '}', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    Syntax Error: line: 3, char: 2, message: mismatched input 'public' expecting {'{', '}', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    line 4:10 token recognition error at: '"'
+    line 4:11 token recognition error at: '"'
+
+FILENAME: testcase00_13.java
+STANDARD_ERROR
+    line 15:5 no viable alternative at input 'gcd.'
+    Syntax Error: line: 15, char: 5, message: no viable alternative at input 'gcd.'
+    line 17:37 mismatched input '()' expecting '('
+    Syntax Error: line: 17, char: 37, message: mismatched input '()' expecting '('
+    line 18:38 mismatched input '()' expecting '('
+    Syntax Error: line: 18, char: 38, message: mismatched input '()' expecting '('
+    line 41:10 mismatched input '(' expecting {';', '.'}
+    Syntax Error: line: 41, char: 10, message: mismatched input '(' expecting {';', '.'}
+    line 44:22 extraneous input '()' expecting {';', '.'}
+    Syntax Error: line: 44, char: 22, message: extraneous input '()' expecting {';', '.'}
+    line 57:22 extraneous input 'return' expecting {'{', '}', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    Syntax Error: line: 57, char: 22, message: extraneous input 'return' expecting {'{', '}', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    line 57:31 no viable alternative at input 'n -'
+    Syntax Error: line: 57, char: 31, message: no viable alternative at input 'n -'
+    line 60:1 extraneous input '}' expecting {'{', 'return', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    Syntax Error: line: 60, char: 1, message: extraneous input '}' expecting {'{', 'return', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    line 62:1 extraneous input 'public' expecting {<EOF>, 'class'}
+    Syntax Error: line: 62, char: 1, message: extraneous input 'public' expecting {<EOF>, 'class'}
+STANDARD_OUT
+    VarDecl
+    VarDecl
+    VarDecl
+    Print
+    Print
+    Assigment
+    Assigment
+    VarDecl
+    IfElse
+    Assigment
+    block
+    VarDecl
+    VarDecl
+    Assigment
+    Assigment
+    Assigment
+    Assigment
+    Assigment
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+    block
+
+FILENAME: testcase03_04.java
+STANDARD_ERROR
+    line 10:13 mismatched input 'null' expecting {'{', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    Syntax Error: line: 10, char: 13, message: mismatched input 'null' expecting {'{', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    line 22:0 missing '}' at 'class'
+    Syntax Error: line: 22, char: 0, message: missing '}' at 'class'
+    line 25:13 no viable alternative at input ';'
+    Syntax Error: line: 25, char: 13, message: no viable alternative at input ';'
+    line 31:15 mismatched input ';' expecting '('
+    Syntax Error: line: 31, char: 15, message: mismatched input ';' expecting '('
+    line 58:21 extraneous input ')' expecting {';', '.'}
+    Syntax Error: line: 58, char: 21, message: extraneous input ')' expecting {';', '.'}
+    line 81:19 extraneous input '1000' expecting {')', '.', ','}
+    Syntax Error: line: 81, char: 19, message: extraneous input '1000' expecting {')', '.', ','}
+STANDARD_OUT
+    VarDecl
+    IfElse
+    Assigment
+    Print
+    VarDecl
+    VarDecl
+    Print
+    block
+    Print
+    IfElse
+    Print
+    Print
+    VarDecl
+    VarDecl
+    VarDecl
+    Assigment
+    Assigment
+    WhileDecl
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+    Print
+    Print
+
+FILENAME: testcase00_11.java
+STANDARD_OUT
+    VarDecl
+    VarDecl
+    VarDecl
+    VarDecl
+    VarDecl
+    VarDecl
+    VarDecl
+    VarDecl
+    VarDecl
+    Print
+    Print
+    Print
+    Print
+    Print
+    Print
+    WhileDecl
+    Assigment
+    IfElse
+    Print
+    Print
+    VarDecl
+    VarDecl
+    WhileDecl
+    block
+    Print
+    Assigment
+    Assigment
+    IfElse
+    block
+    VarDecl
+    Print
+    block
+    Print
+    Print
+    Print
+    Print
+    Print
+    Assigment
+    VarDecl
+    Assigment
+    IfElse
+    Assigment
+    block
+    VarDecl
+    IfElse
+    Assigment
+    WhileDecl
+    Assigment
+    Assigment
+    Assigment
+    Print
+    VarDecl
+    VarDecl
+    VarDecl
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    block
+    Assigment
+    Assigment
+    Assigment
+    IfElse
+    Assigment
+    Assigment
+
+FILENAME: testcase00_16.java
+STANDARD_OUT
+    VarDecl
+    IfElse
+    block
+    block
+    Assigment
+    WhileDecl
+    Print
+
+FILENAME: testcase02_03.java
+STANDARD_ERROR
+    line 31:24 token recognition error at: '| '
+    line 31:26 mismatched input 'something' expecting {';', '.'}
+    Syntax Error: line: 31, char: 26, message: mismatched input 'something' expecting {';', '.'}
+STANDARD_OUT
+    VarDecl
+    Assigment
+    Assigment
+    block
+    Assigment
+    IfElse
+    Print
+    WhileDecl
+    Assigment
+    Assigment
+    VarDecl
+    Assigment
+    Assigment
+    Assigment
+    Assigment
+    Assigment
+    Assigment
+
+FILENAME: testcase04_01.java
+STANDARD_ERROR
+    line 5:30 mismatched input 'return' expecting {'{', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    Syntax Error: line: 5, char: 30, message: mismatched input 'return' expecting {'{', 'if', 'while', 'System.out.println', 'boolean', 'int', ID}
+    line 5:49 mismatched input ';' expecting '('
+    Syntax Error: line: 5, char: 49, message: mismatched input ';' expecting '('
+    line 5:50 mismatched input 'else' expecting '}'
+    Syntax Error: line: 5, char: 50, message: mismatched input 'else' expecting '}'
+    line 7:0 extraneous input 'public' expecting {<EOF>, 'class'}
+    Syntax Error: line: 7, char: 0, message: extraneous input 'public' expecting {<EOF>, 'class'}
+STANDARD_OUT
+    Print
+    IfElse
