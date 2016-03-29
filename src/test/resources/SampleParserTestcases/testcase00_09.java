@@ -46,7 +46,7 @@ class Math {
 }
 
 class Empty {
-    
+
 }
 
 class Nothing extends Empty {

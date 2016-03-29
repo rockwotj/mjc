@@ -7,16 +7,16 @@ classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID (LPAREN (formal (',' formal)*)? RPAREN | PAREN) '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
 type : INT_TYPE | BOOL_TYPE | ID ;
-stmt : varDecl
-    | block
-    | ifElse
-    | whileDecl
-    | print
-    | assigment ;
+stmt : varDecl | stmtWithoutVarDecl ;
+stmtWithoutVarDecl: block
+ | ifElse
+ | whileDecl
+ | print
+ | assigment ;
 varDecl : type ID  '=' expr ';' ;
 block : '{' (stmt)* '}' ;
-ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
-whileDecl : 'while' '(' expr ')' stmt ;
+ifElse : 'if' '(' expr ')' stmtWithoutVarDecl 'else' stmtWithoutVarDecl ;
+whileDecl : 'while' '(' expr ')' stmtWithoutVarDecl ;
 print : 'System.out.println' '(' expr')' ';' ;
 assigment : ID  '=' expr ';' ;
 

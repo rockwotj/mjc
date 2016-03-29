@@ -9,7 +9,7 @@ import java.io.IOException;
 public class Compiler {
     public static void main(String[] args) throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/OperatorParsePrecedence.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleParserTestcases/testcase00_09.java"));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -28,10 +28,15 @@ public class Compiler {
         ParseTreeWalker walker = new ParseTreeWalker();
         ContextSenstiveAnalysis csa = new ContextSenstiveAnalysis();
         walker.walk(csa, parseTreeRoot);
-        System.out.println(csa.getParseTree().toString());
+//        System.out.println(csa.getParseTree().toString());
+
+        // Build class info
+        ClassTreeWalker ctw = new ClassTreeWalker(csa.getParseTree());
+        ctw.walk();
+//        System.out.println(ctw.getClasses());
 
         // Type checking
-        TypeChecker typeCheckingWalker = new TypeChecker(csa.getParseTree());
+        TypeChecker typeCheckingWalker = new TypeChecker(csa.getParseTree(), ctw.getClasses());
         typeCheckingWalker.walk();
     }
 }
