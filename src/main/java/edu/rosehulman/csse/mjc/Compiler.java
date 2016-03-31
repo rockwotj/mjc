@@ -1,10 +1,14 @@
 package edu.rosehulman.csse.mjc;
 
 
-import org.antlr.v4.runtime.*;
+import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
+import edu.rosehulman.csse.mjc.reflect.Class;
+import org.antlr.v4.runtime.ANTLRFileStream;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
+import java.util.List;
 
 public class Compiler {
     public static void main(String[] args) throws IOException {
@@ -18,25 +22,27 @@ public class Compiler {
         MiniJavaParser parser = new MiniJavaParser(tokens);
 
         // Listen for errors
-        MiniJavaErrorListener errorListener = new MiniJavaErrorListener();
+        ParserErrorListener errorListener = new ParserErrorListener();
         parser.addErrorListener(errorListener);
 
         // Specify parser grammer entry point
         MiniJavaParser.ProgramContext parseTreeRoot = parser.program();
 
-        // Walk parse tree and attach our listener
+        // Walk parse tree and create AST
         ParseTreeWalker walker = new ParseTreeWalker();
-        ContextSenstiveAnalysis csa = new ContextSenstiveAnalysis();
-        walker.walk(csa, parseTreeRoot);
-//        System.out.println(csa.getParseTree().toString());
+        ASTBuilder astBuilder = new ASTBuilder();
+        walker.walk(astBuilder, parseTreeRoot);
+        AbstractSyntaxNode ast = astBuilder.getAbstractSyntaxTree();
+        //System.out.println(ast.toString());
 
         // Build class info
-        ClassTreeWalker ctw = new ClassTreeWalker(csa.getParseTree());
-        ctw.walk();
-//        System.out.println(ctw.getClasses());
+        ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);
+        chb.walk();
+        List<Class> classList = chb.getClasses();
 
         // Type checking
-        TypeChecker typeCheckingWalker = new TypeChecker(csa.getParseTree(), ctw.getClasses());
+        TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
         typeCheckingWalker.walk();
+
     }
 }

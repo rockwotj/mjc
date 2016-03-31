@@ -2,22 +2,19 @@ package edu.rosehulman.csse.mjc;
 
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode.NodeType;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ErrorNode;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.util.Stack;
 
-public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
+public class ASTBuilder extends MiniJavaBaseListener {
 
     private Stack<AbstractSyntaxNode> parents = new Stack<>();
-    private AbstractSyntaxNode<MiniJavaParser.ProgramContext> parseTree;
+    private AbstractSyntaxNode<MiniJavaParser.ProgramContext> ast;
     private AbstractSyntaxNode currentNode;
 
     @Override
     public void enterProgram(MiniJavaParser.ProgramContext ctx) {
-        parseTree = new AbstractSyntaxNode<>(ctx, NodeType.program);
-        currentNode = parseTree;
+        ast = new AbstractSyntaxNode<>(ctx, NodeType.program);
+        currentNode = ast;
     }
 
     @Override
@@ -372,23 +369,8 @@ public class ContextSenstiveAnalysis extends MiniJavaBaseListener {
     }
 
 
-    public AbstractSyntaxNode<MiniJavaParser.ProgramContext> getParseTree() {
-        return parseTree;
+    public AbstractSyntaxNode<MiniJavaParser.ProgramContext> getAbstractSyntaxTree() {
+        return ast;
     }
 
-    @Override
-    public void visitTerminal(TerminalNode node) {
-    }
-
-    @Override
-    public void visitErrorNode(ErrorNode node) {
-    }
-
-    @Override
-    public void enterEveryRule(ParserRuleContext ctx) {
-    }
-
-    @Override
-    public void exitEveryRule(ParserRuleContext ctx) {
-    }
 }

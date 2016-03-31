@@ -7,7 +7,7 @@ import org.antlr.v4.runtime.Recognizer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MiniJavaErrorListener extends BaseErrorListener {
+public class ParserErrorListener extends BaseErrorListener {
 
     private List<RecognitionException> exceptions = new ArrayList<>();
 

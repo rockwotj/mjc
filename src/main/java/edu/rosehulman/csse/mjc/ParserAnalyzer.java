@@ -8,8 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 public class ParserAnalyzer {
-    private final MiniJavaErrorListener errorListener;
-    private final MiniJavaListenerImpl listener;
+    private final ParserErrorListener errorListener;
 
     public ParserAnalyzer(File file) throws IOException {
         MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream(file.getAbsolutePath()));
@@ -19,7 +18,7 @@ public class ParserAnalyzer {
         MiniJavaParser parser = new MiniJavaParser(tokens);
 
         // Listen for errors
-        errorListener = new MiniJavaErrorListener();
+        errorListener = new ParserErrorListener();
         parser.addErrorListener(errorListener);
 
         // Specify parser grammer entry point
@@ -27,12 +26,45 @@ public class ParserAnalyzer {
 
         // Walk parse tree and attach our listener
         ParseTreeWalker walker = new ParseTreeWalker();
-        listener = new MiniJavaListenerImpl();
+        MiniJavaListenerImpl listener = new MiniJavaListenerImpl();
 
         walker.walk(listener, progContext);
     }
 
-     public int getErrorCount() {
-         return errorListener.getExceptions().size();
-     }
+    public int getErrorCount() {
+        return errorListener.getExceptions().size();
+    }
+
+    private class MiniJavaListenerImpl extends MiniJavaBaseListener {
+
+        @Override
+        public void enterBlock(MiniJavaParser.BlockContext ctx) {
+            System.out.println("block");
+        }
+
+        @Override
+        public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
+            System.out.println("VarDecl");
+        }
+
+        @Override
+        public void enterIfElse(MiniJavaParser.IfElseContext ctx) {
+            System.out.println("IfElse");
+        }
+
+        @Override
+        public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
+            System.out.println("Assigment");
+        }
+
+        @Override
+        public void enterWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
+            System.out.println("WhileDecl");
+        }
+
+        @Override
+        public void enterPrint(MiniJavaParser.PrintContext ctx) {
+            System.out.println("Print");
+        }
+    }
 }
