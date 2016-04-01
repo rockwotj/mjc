@@ -3,16 +3,16 @@ package edu.rosehulman.csse.mjc.reflect;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Environment {
+public class SymbolTable {
 
     private Map<String, String> vars = new HashMap<>();
-    private Environment parent = null;
+    private SymbolTable parent = null;
 
-    public Environment() {
+    public SymbolTable() {
 
     }
 
-    public Environment(Environment parent) {
+    public SymbolTable(SymbolTable parent) {
         this.parent = parent;
     }
 
@@ -34,7 +34,7 @@ public class Environment {
         vars.put(name, type);
     }
 
-    public Environment getParent() {
+    public SymbolTable getParent() {
         return parent;
     }
 }

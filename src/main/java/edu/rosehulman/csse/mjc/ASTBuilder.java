@@ -166,7 +166,10 @@ public class ASTBuilder extends MiniJavaBaseListener {
 
     @Override
     public void enterExpr(MiniJavaParser.ExprContext ctx) {
+
     }
+
+
 
     @Override
     public void enterLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
@@ -349,23 +352,19 @@ public class ASTBuilder extends MiniJavaBaseListener {
 
     @Override
     public void exitExpr(MiniJavaParser.ExprContext ctx) {
+        if (!ctx.exprPrime().isEmpty() && ctx.logicalOr() == null) {
+            currentNode = parents.pop();
+        }
     }
 
     @Override
     public void enterExprPrime(MiniJavaParser.ExprPrimeContext ctx) {
-        if (ctx.ID() != null) {
-            parents.push(currentNode);
-            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.expr);
-            currentNode.addChild(node);
-            currentNode = node;
-        }
+
     }
 
     @Override
     public void exitExprPrime(MiniJavaParser.ExprPrimeContext ctx) {
-        if (ctx.ID() != null) {
-            currentNode = parents.pop();
-        }
+
     }
 
 

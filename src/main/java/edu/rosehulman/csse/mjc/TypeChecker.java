@@ -3,7 +3,7 @@ package edu.rosehulman.csse.mjc;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.Walker;
 import edu.rosehulman.csse.mjc.reflect.Class;
-import edu.rosehulman.csse.mjc.reflect.Environment;
+import edu.rosehulman.csse.mjc.reflect.SymbolTable;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,8 +13,8 @@ import java.util.Stack;
 public class TypeChecker extends Walker {
 
     private final List<Class> classes;
-    private Stack<String> resultantTypes = new Stack<>();
-    private Environment env = new Environment();
+    private Stack<String> typeStack = new Stack<>();
+    private SymbolTable symbolTable = new SymbolTable();
 
     public TypeChecker(AbstractSyntaxNode root, List<Class> classes) {
         super(root);
@@ -37,7 +37,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
-
+        symbolTable = symbolTable.getParent();
     }
 
     protected void exitFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
@@ -55,26 +55,31 @@ public class TypeChecker extends Walker {
     protected void exitVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
         String varName = current.getContext().ID().getText();
         String varType = current.getContext().type().getText();
-
-        String resultType = resultantTypes.pop();
+        String resultType = typeStack.pop();
         if (!Objects.equals(varType, resultType)) {
             throw new RuntimeException("variable " + varName + " expecting type: " + varType + " got type: " + resultType);
         } else {
-            env.addVar(varName, varType);
+            symbolTable.addVar(varName, varType);
         }
-        if (!resultantTypes.isEmpty()) {
-            System.err.println(resultantTypes.toString());
+        if (!typeStack.isEmpty()) {
+            System.err.println(typeStack.toString());
         }
-        resultantTypes.clear();
+        typeStack.clear();
     }
 
     protected void exitBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
     }
 
     protected void exitIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current) {
+        if (!Objects.equals("boolean", typeStack.pop())) {
+            System.err.println("Invalid type for while statement, expected bool");
+        }
     }
 
     protected void exitWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
+        if (!Objects.equals("boolean", typeStack.pop())) {
+            System.err.println("Invalid type for while statement, expected bool");
+        }
     }
 
     protected void exitPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
@@ -84,112 +89,113 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current) {
+        System.out.println(current.getContext().getText());
     }
 
     protected void exitLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current) {
-        if (!Objects.equals("boolean", resultantTypes.pop()) || !Objects.equals("boolean", resultantTypes.pop())) {
+        if (!Objects.equals("boolean", typeStack.pop()) || !Objects.equals("boolean", typeStack.pop())) {
             System.err.println("Invalid type for && operator, expected bool");
         }
-        resultantTypes.push("boolean");
+        typeStack.push("boolean");
     }
 
     protected void exitLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current) {
-        if (!Objects.equals("boolean", resultantTypes.pop()) || !Objects.equals("boolean", resultantTypes.pop())) {
+        if (!Objects.equals("boolean", typeStack.pop()) || !Objects.equals("boolean", typeStack.pop())) {
             System.err.println("Invalid type for || operator, expected bool");
         }
-        resultantTypes.push("boolean");
+        typeStack.push("boolean");
     }
 
     protected void exitEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        if (!Objects.equals(resultantTypes.pop(), resultantTypes.pop())) {
+        if (!Objects.equals(typeStack.pop(), typeStack.pop())) {
             System.err.println("Mismatched types for == operator");
         }
-        resultantTypes.push("boolean");
+        typeStack.push("boolean");
     }
 
     protected void exitNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        if (!Objects.equals(resultantTypes.pop(), resultantTypes.pop())) {
+        if (!Objects.equals(typeStack.pop(), typeStack.pop())) {
             System.err.println("Mismatched types for != operator");
         }
-        resultantTypes.push("boolean");
+        typeStack.push("boolean");
     }
 
     protected void exitLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || !Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for < operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("boolean");
     }
 
     protected void exitGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || "int" != resultantTypes.pop()) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for > operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("boolean");
     }
 
     protected void exitLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || !Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for <= operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("boolean");
     }
 
     protected void exitGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || !Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for >= operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("boolean");
     }
 
     protected void exitPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || !Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for + operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("int");
     }
 
     protected void exitMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || !Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for - operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("int");
     }
 
     protected void exitMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || !Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for * operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("int");
     }
 
     protected void exitDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop()) || (!Objects.equals("int", resultantTypes.pop()))) {
+        if (!Objects.equals("int", typeStack.pop()) || (!Objects.equals("int", typeStack.pop()))) {
             System.err.println("Invalid type for / operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("int");
     }
 
     protected void exitBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
-        if (!Objects.equals("boolean", resultantTypes.pop())) {
+        if (!Objects.equals("boolean", typeStack.pop())) {
             System.err.println("Invalid type for ! operator, expected bool");
         }
-        resultantTypes.push("boolean");
+        typeStack.push("boolean");
     }
 
     protected void exitNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
-        if (!Objects.equals("int", resultantTypes.pop())) {
+        if (!Objects.equals("int", typeStack.pop())) {
             System.err.println("Invalid type for - operator, expected int");
         }
-        resultantTypes.push("int");
+        typeStack.push("int");
     }
 
     protected void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-        resultantTypes.push("int");
+        typeStack.push("int");
     }
 
     protected void exitBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-        resultantTypes.push("boolean");
+        typeStack.push("boolean");
     }
 
     protected void exitNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
@@ -201,9 +207,17 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String varName = current.getContext().getText();
+        typeStack.push(symbolTable.lookUpVar(varName));
     }
 
     protected void exitConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String constructedType = current.getContext().ID().getText();
+        boolean validClass = classes.stream().anyMatch(c -> c.getName().equals(constructedType));
+        if (!validClass) {
+            throw new RuntimeException("Class " + constructedType + " does not exist!");
+        }
+        typeStack.push(constructedType);
     }
 
 
@@ -299,6 +313,13 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
+        symbolTable = new SymbolTable(symbolTable);
+        List<MiniJavaParser.FormalContext> params = current.getContext().formal();
+        for (MiniJavaParser.FormalContext p : params) {
+            String varName = p.ID().getText();
+            String typeName = p.type().getText();
+            symbolTable.addVar(varName, typeName);
+        }
     }
 
     protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {

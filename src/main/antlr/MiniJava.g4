@@ -7,22 +7,20 @@ classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID (LPAREN (formal (',' formal)*)? RPAREN | PAREN) '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
 type : INT_TYPE | BOOL_TYPE | ID ;
-stmt : varDecl | stmtWithoutVarDecl ;
-stmtWithoutVarDecl: block
+stmt : varDecl
+ | block
  | ifElse
  | whileDecl
  | print
  | assigment ;
 varDecl : type ID  '=' expr ';' ;
 block : '{' (stmt)* '}' ;
-ifElse : 'if' '(' expr ')' stmtWithoutVarDecl 'else' stmtWithoutVarDecl ;
-whileDecl : 'while' '(' expr ')' stmtWithoutVarDecl ;
+ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
+whileDecl : 'while' '(' expr ')' stmt ;
 print : 'System.out.println' '(' expr')' ';' ;
 assigment : ID  '=' expr ';' ;
 
-expr : logicalOr (exprPrime)*;
-
-exprPrime: DOT ID LPAREN expr (COMMA expr)* RPAREN ;
+expr : logicalOr;
 
 logicalOr :
       logicalAnd OR logicalOr
@@ -50,16 +48,27 @@ multOrDiv :
 
 unary :
       (BANG|SUB) expr
-    | atom ;
+    | methodCall ;
+
+methodCall :
+    callableAtom (functionCall)*
+    | callableAtom;
+
+functionCall: DOT ID LPAREN expr (COMMA expr)* RPAREN ;
+
+callableAtom :
+     THIS
+    | NEW ID (PAREN | LPAREN RPAREN)
+    | ID
+    | LPAREN expr RPAREN
+    | atom;
 
 atom :
       INT
     | BOOL
-    | NULL
-    | THIS
-    | NEW ID (PAREN | LPAREN RPAREN)
-    | ID
-    | LPAREN expr RPAREN ;
+    | NULL ;
+
+
 
 // Reserved Words
 NULL : 'null' ;

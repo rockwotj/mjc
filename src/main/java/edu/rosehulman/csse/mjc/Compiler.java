@@ -17,7 +17,6 @@ public class Compiler {
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-
         // Pass the tokens to the parser
         MiniJavaParser parser = new MiniJavaParser(tokens);
 
