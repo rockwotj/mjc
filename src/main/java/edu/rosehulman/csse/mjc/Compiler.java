@@ -13,7 +13,7 @@ import java.util.List;
 public class Compiler {
     public static void main(String[] args) throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleParserTestcases/testcase00_09.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/OperatorParsePrecedence.java"));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -32,7 +32,7 @@ public class Compiler {
         ASTBuilder astBuilder = new ASTBuilder();
         walker.walk(astBuilder, parseTreeRoot);
         AbstractSyntaxNode ast = astBuilder.getAbstractSyntaxTree();
-        //System.out.println(ast.toString());
+        System.out.println(ast.toString());
 
         // Build class info
         ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);

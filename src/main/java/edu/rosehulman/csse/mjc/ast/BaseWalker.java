@@ -19,7 +19,7 @@ public abstract class BaseWalker extends Walker {
     }
 
     @Override
-    protected void exitClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
+    protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
 
     }
 
@@ -154,6 +154,11 @@ public abstract class BaseWalker extends Walker {
     }
 
     @Override
+    protected void enterMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
+
+    }
+
+    @Override
     protected void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
 
     }
@@ -210,6 +215,11 @@ public abstract class BaseWalker extends Walker {
 
     @Override
     protected void enterInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
+    protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
 
     }
 
@@ -344,17 +354,17 @@ public abstract class BaseWalker extends Walker {
     }
 
     @Override
-    protected void enterClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
+    protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
 
     }
 
     @Override
-    protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node) {
+    protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
 
     }
 
     @Override
-    protected void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> node) {
+    protected void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current) {
 
     }
 }

@@ -25,15 +25,12 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
-
     }
 
-    protected void exitClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
-
+    protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
     }
 
     protected void exitClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
-
     }
 
     protected void exitMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
@@ -41,15 +38,12 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
-
     }
 
     protected void exitType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current) {
-
     }
 
     protected void exitStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current) {
-
     }
 
     protected void exitVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
@@ -190,6 +184,23 @@ public class TypeChecker extends Walker {
         typeStack.push("int");
     }
 
+    protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
+    	/*  TODO
+           -Pop off the number of elements equal to the number of elements we were passed
+   		   -The top of the stack now contains the type of the object calling the function
+   		   -The ID is the method and can be looked up int the class hierarchy
+           -Confirm the method signiture with the types we poped off
+           -Push the return type of the method on the stack */
+   		   System.out.println(current.getContext().getText());
+    	// symbolTable = new SymbolTable(symbolTable);
+    	// List<MiniJavaParser.FormalContext> params = current.getContext().formal();
+    	// for (MiniJavaParser.FormalContext p : params) {
+    	//     String varName = p.ID().getText();
+    	//     String typeName = p.type().getText();
+    	//     symbolTable.addVar(varName, typeName);
+    	// }
+    }
+
     protected void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         typeStack.push("int");
     }
@@ -199,7 +210,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+    	typeStack.push("null");
     }
 
     protected void exitThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
@@ -238,6 +249,9 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+    }
+
+    protected void enterMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
     }
 
     protected void enterNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
@@ -313,19 +327,12 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
-        symbolTable = new SymbolTable(symbolTable);
-        List<MiniJavaParser.FormalContext> params = current.getContext().formal();
-        for (MiniJavaParser.FormalContext p : params) {
-            String varName = p.ID().getText();
-            String typeName = p.type().getText();
-            symbolTable.addVar(varName, typeName);
-        }
     }
 
     protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
     }
 
-    protected void enterClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
+    protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
     }
 
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node) {

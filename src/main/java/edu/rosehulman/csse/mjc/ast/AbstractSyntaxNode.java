@@ -44,6 +44,7 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
         div,
         bang,
         negative,
+        methodCall,
         integer,
         bool,
         nil,

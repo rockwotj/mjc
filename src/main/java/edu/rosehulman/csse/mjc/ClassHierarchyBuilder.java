@@ -39,7 +39,7 @@ public class ClassHierarchyBuilder extends BaseWalker {
     }
 
     @Override
-    protected void enterClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> node) {
+    protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> node) {
         this.current = new Class(node.getContext().ID(0).getText());
         if (classes.stream().anyMatch(c -> c.getName().equals(current.getName()))) {
             throw new RuntimeException("Duplicate class name: " + current.getName());

@@ -20,7 +20,7 @@ whileDecl : 'while' '(' expr ')' stmt ;
 print : 'System.out.println' '(' expr')' ';' ;
 assigment : ID  '=' expr ';' ;
 
-expr : logicalOr;
+expr : logicalOr ;
 
 logicalOr :
       logicalAnd OR logicalOr
@@ -51,23 +51,17 @@ unary :
     | methodCall ;
 
 methodCall :
-    callableAtom (functionCall)*
-    | callableAtom;
-
-functionCall: DOT ID LPAREN expr (COMMA expr)* RPAREN ;
-
-callableAtom :
-     THIS
-    | NEW ID (PAREN | LPAREN RPAREN)
-    | ID
-    | LPAREN expr RPAREN
-    | atom;
+      atom DOT ID LPAREN expr (COMMA expr)* RPAREN
+    | atom ;
 
 atom :
       INT
     | BOOL
-    | NULL ;
-
+    | NULL
+    | THIS
+    | NEW ID (PAREN | LPAREN RPAREN)
+    | ID
+    | LPAREN expr RPAREN ;
 
 
 // Reserved Words

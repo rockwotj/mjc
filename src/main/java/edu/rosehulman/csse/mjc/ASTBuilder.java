@@ -18,17 +18,15 @@ public class ASTBuilder extends MiniJavaBaseListener {
     }
 
     @Override
-    public void exitProgram(MiniJavaParser.ProgramContext ctx) {
-    }
+    public void exitProgram(MiniJavaParser.ProgramContext ctx) { }
 
     @Override
     public void enterMainClassDecl(MiniJavaParser.MainClassDeclContext ctx) {
         parents.push(currentNode);
-        AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node = new AbstractSyntaxNode<>(ctx, NodeType.mainClassDecl);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.mainClassDecl);
         currentNode.addChild(node);
         currentNode = node;
     }
-
 
     @Override
     public void exitMainClassDecl(MiniJavaParser.MainClassDeclContext ctx) {
@@ -61,115 +59,121 @@ public class ASTBuilder extends MiniJavaBaseListener {
         currentNode = parents.pop();
     }
 
+   @Override
+   public void enterMethodDecl(MiniJavaParser.MethodDeclContext ctx) {
+       parents.push(currentNode);
+       AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.methodDecl);
+       currentNode.addChild(node);
+       currentNode = node;
+   }
+
+   @Override
+   public void exitMethodDecl(MiniJavaParser.MethodDeclContext ctx) {
+       currentNode = parents.pop();
+   }
+
+   @Override
+   public void enterFormal(MiniJavaParser.FormalContext ctx) {
+   }
+
+   @Override
+   public void exitFormal(MiniJavaParser.FormalContext ctx) { }
+
+   @Override
+   public void enterType(MiniJavaParser.TypeContext ctx) { }
+
+   @Override
+   public void exitType(MiniJavaParser.TypeContext ctx) { }
+
     @Override
-    public void enterMethodDecl(MiniJavaParser.MethodDeclContext ctx) {
+    public void enterStmt(MiniJavaParser.StmtContext ctx) { }
+
+    @Override
+    public void exitStmt(MiniJavaParser.StmtContext ctx) { }
+
+   @Override
+   public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
+       parents.push(currentNode);
+       AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.varDecl);
+       currentNode.addChild(node);
+       currentNode = node;
+   }
+
+   @Override
+   public void exitVarDecl(MiniJavaParser.VarDeclContext ctx) {
+       currentNode = parents.pop();
+   }
+
+   @Override
+   public void enterBlock(MiniJavaParser.BlockContext ctx) {
         parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.methodDecl);
+        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.block);
         currentNode.addChild(node);
         currentNode = node;
-    }
+   }
 
-    @Override
-    public void exitMethodDecl(MiniJavaParser.MethodDeclContext ctx) {
+   @Override
+   public void exitBlock(MiniJavaParser.BlockContext ctx) {
         currentNode = parents.pop();
-    }
+   }
 
-    @Override
-    public void enterFormal(MiniJavaParser.FormalContext ctx) {
-    }
+   @Override
+   public void enterIfElse(MiniJavaParser.IfElseContext ctx) {
+       parents.push(currentNode);
+       AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.ifElse);
+       currentNode.addChild(node);
+       currentNode = node;
+   }
 
-    @Override
-    public void exitFormal(MiniJavaParser.FormalContext ctx) {
+   @Override
+   public void exitIfElse(MiniJavaParser.IfElseContext ctx) {
+       currentNode = parents.pop();
+   }
 
-    }
+   @Override
+   public void enterWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
+       parents.push(currentNode);
+       AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.whileDecl);
+       currentNode.addChild(node);
+       currentNode = node;
+   }
 
-    @Override
-    public void enterType(MiniJavaParser.TypeContext ctx) {
-    }
+   @Override
+   public void exitWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
+       currentNode = parents.pop();
+   }
 
-    @Override
-    public void exitType(MiniJavaParser.TypeContext ctx) {
-    }
+   @Override
+   public void enterPrint(MiniJavaParser.PrintContext ctx) {
+       parents.push(currentNode);
+       AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.print);
+       currentNode.addChild(node);
+       currentNode = node;
+   }
 
-    @Override
-    public void enterVarDecl(MiniJavaParser.VarDeclContext ctx) {
-        parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.varDecl);
-        currentNode.addChild(node);
-        currentNode = node;
-    }
+   @Override
+   public void exitPrint(MiniJavaParser.PrintContext ctx) {
+       currentNode = parents.pop();
+   }
 
-    @Override
-    public void exitVarDecl(MiniJavaParser.VarDeclContext ctx) {
-        currentNode = parents.pop();
-    }
+   @Override
+   public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
+       parents.push(currentNode);
+       AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.assigment);
+       currentNode.addChild(node);
+       currentNode = node;
+   }
 
-    @Override
-    public void enterBlock(MiniJavaParser.BlockContext ctx) {
-    }
+   @Override
+   public void exitAssigment(MiniJavaParser.AssigmentContext ctx) {
+       currentNode = parents.pop();
+   }
 
-    @Override
-    public void exitBlock(MiniJavaParser.BlockContext ctx) {
-    }
+   @Override
+   public void enterExpr(MiniJavaParser.ExprContext ctx) { }
 
-    @Override
-    public void enterIfElse(MiniJavaParser.IfElseContext ctx) {
-        parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.ifElse);
-        currentNode.addChild(node);
-        currentNode = node;
-    }
-
-    @Override
-    public void exitIfElse(MiniJavaParser.IfElseContext ctx) {
-        currentNode = parents.pop();
-    }
-
-    @Override
-    public void enterWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
-        parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.whileDecl);
-        currentNode.addChild(node);
-        currentNode = node;
-    }
-
-    @Override
-    public void exitWhileDecl(MiniJavaParser.WhileDeclContext ctx) {
-        currentNode = parents.pop();
-    }
-
-    @Override
-    public void enterPrint(MiniJavaParser.PrintContext ctx) {
-        parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.print);
-        currentNode.addChild(node);
-        currentNode = node;
-    }
-
-    @Override
-    public void exitPrint(MiniJavaParser.PrintContext ctx) {
-        currentNode = parents.pop();
-    }
-
-    @Override
-    public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
-        parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.assigment);
-        currentNode.addChild(node);
-        currentNode = node;
-    }
-
-    @Override
-    public void exitAssigment(MiniJavaParser.AssigmentContext ctx) {
-        currentNode = parents.pop();
-    }
-
-    @Override
-    public void enterExpr(MiniJavaParser.ExprContext ctx) {
-
-    }
-
-
+   @Override
+   public void exitExpr(MiniJavaParser.ExprContext ctx) { }
 
     @Override
     public void enterLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
@@ -179,7 +183,13 @@ public class ASTBuilder extends MiniJavaBaseListener {
             currentNode.addChild(node);
             currentNode = node;
         }
+    }
 
+    @Override
+    public void exitLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
+        if (ctx.OR() != null) {
+            currentNode = parents.pop();
+        }
     }
 
     @Override
@@ -189,6 +199,13 @@ public class ASTBuilder extends MiniJavaBaseListener {
             AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.logicalAnd);
             currentNode.addChild(node);
             currentNode = node;
+        }
+    }
+
+    @Override
+    public void exitLogicalAnd(MiniJavaParser.LogicalAndContext ctx) {
+        if (ctx.AND() != null) {
+            currentNode = parents.pop();
         }
     }
 
@@ -204,6 +221,13 @@ public class ASTBuilder extends MiniJavaBaseListener {
             parents.push(currentNode);
             currentNode.addChild(node);
             currentNode = node;
+        }
+    }
+
+    @Override
+    public void exitEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
+        if (ctx.EEQ() != null || ctx.NEQ() != null) {
+            currentNode = parents.pop();
         }
     }
 
@@ -227,6 +251,13 @@ public class ASTBuilder extends MiniJavaBaseListener {
     }
 
     @Override
+    public void exitRelation(MiniJavaParser.RelationContext ctx) {
+        if (ctx.LEQ() != null || ctx.GEQ() != null || ctx.LT() != null || ctx.GT() != null) {
+            currentNode = parents.pop();
+        }
+    }
+
+    @Override
     public void enterPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
         AbstractSyntaxNode node = null;
         if (ctx.ADD() != null) {
@@ -238,6 +269,13 @@ public class ASTBuilder extends MiniJavaBaseListener {
             parents.push(currentNode);
             currentNode.addChild(node);
             currentNode = node;
+        }
+    }
+
+    @Override
+    public void exitPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
+        if (ctx.ADD() != null || ctx.SUB() != null) {
+            currentNode = parents.pop();
         }
     }
 
@@ -257,6 +295,13 @@ public class ASTBuilder extends MiniJavaBaseListener {
     }
 
     @Override
+    public void exitMultOrDiv(MiniJavaParser.MultOrDivContext ctx) {
+        if (ctx.MUL() != null || ctx.DIV() != null) {
+            currentNode = parents.pop();
+        }
+    }
+
+    @Override
     public void enterUnary(MiniJavaParser.UnaryContext ctx) {
         AbstractSyntaxNode node = null;
         if (ctx.BANG() != null) {
@@ -268,6 +313,30 @@ public class ASTBuilder extends MiniJavaBaseListener {
             parents.push(currentNode);
             currentNode.addChild(node);
             currentNode = node;
+        }
+    }
+
+    @Override
+    public void exitUnary(MiniJavaParser.UnaryContext ctx) {
+        if (ctx.BANG() != null || ctx.SUB() != null) {
+            currentNode = parents.pop();
+        }
+    }
+
+    @Override
+    public void enterMethodCall(MiniJavaParser.MethodCallContext ctx) {
+        if (ctx.DOT() != null) {
+            AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.methodCall);
+            parents.push(currentNode);
+            currentNode.addChild(node);
+            currentNode = node;
+        }
+    }
+
+    @Override
+    public void exitMethodCall(MiniJavaParser.MethodCallContext ctx) {
+        if (ctx.DOT() != null) {
+            currentNode = parents.pop();
         }
     }
 
@@ -301,72 +370,17 @@ public class ASTBuilder extends MiniJavaBaseListener {
         }
     }
 
-    @Override
-    public void exitUnary(MiniJavaParser.UnaryContext ctx) {
-        if (ctx.BANG() != null || ctx.SUB() != null) {
-            currentNode = parents.pop();
-        }
-    }
+    // @Override
+    // public void enterEveryRule(ParserRuleContext ctx) { }
 
-    @Override
-    public void exitMultOrDiv(MiniJavaParser.MultOrDivContext ctx) {
-        if (ctx.MUL() != null || ctx.DIV() != null) {
-            currentNode = parents.pop();
-        }
-    }
+    // @Override
+    // public void exitEveryRule(ParserRuleContext ctx) { }
 
-    @Override
-    public void exitPlusOrMinus(MiniJavaParser.PlusOrMinusContext ctx) {
-        if (ctx.ADD() != null || ctx.SUB() != null) {
-            currentNode = parents.pop();
-        }
-    }
+    // @Override
+    // public void visitTerminal(TerminalNode node) { }
 
-    @Override
-    public void exitRelation(MiniJavaParser.RelationContext ctx) {
-        if (ctx.LEQ() != null || ctx.GEQ() != null || ctx.LT() != null || ctx.GT() != null) {
-            currentNode = parents.pop();
-        }
-    }
-
-    @Override
-    public void exitEqualsOrNotEquals(MiniJavaParser.EqualsOrNotEqualsContext ctx) {
-        if (ctx.EEQ() != null || ctx.NEQ() != null) {
-            currentNode = parents.pop();
-        }
-    }
-
-    @Override
-    public void exitLogicalAnd(MiniJavaParser.LogicalAndContext ctx) {
-        if (ctx.AND() != null) {
-            currentNode = parents.pop();
-        }
-    }
-
-    @Override
-    public void exitLogicalOr(MiniJavaParser.LogicalOrContext ctx) {
-        if (ctx.OR() != null) {
-            currentNode = parents.pop();
-        }
-    }
-
-    @Override
-    public void exitExpr(MiniJavaParser.ExprContext ctx) {
-        if (!ctx.exprPrime().isEmpty() && ctx.logicalOr() == null) {
-            currentNode = parents.pop();
-        }
-    }
-
-    @Override
-    public void enterExprPrime(MiniJavaParser.ExprPrimeContext ctx) {
-
-    }
-
-    @Override
-    public void exitExprPrime(MiniJavaParser.ExprPrimeContext ctx) {
-
-    }
-
+    // @Override
+    // public void visitErrorNode(ErrorNode node) { }
 
     public AbstractSyntaxNode<MiniJavaParser.ProgramContext> getAbstractSyntaxTree() {
         return ast;

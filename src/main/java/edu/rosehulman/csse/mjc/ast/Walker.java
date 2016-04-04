@@ -32,7 +32,7 @@ public abstract class Walker {
                 enterMainClassDecl(current);
                 break;
             case classDecl:
-                enterClassDel(current);
+                enterClassDecl(current);
                 break;
             case classVarDecl:
                 enterClassVarDecl(current);
@@ -112,6 +112,9 @@ public abstract class Walker {
             case negative:
                 enterNeg(current);
                 break;
+            case methodCall:
+                enterMethodCall(current);
+                break;
             case integer:
                 enterInt(current);
                 break;
@@ -145,7 +148,7 @@ public abstract class Walker {
                 exitMainClassDecl(current);
                 break;
             case classDecl:
-                exitClassDel(current);
+                exitClassDecl(current);
                 break;
             case classVarDecl:
                 exitClassVarDecl(current);
@@ -225,6 +228,9 @@ public abstract class Walker {
             case negative:
                 exitNeg(current);
                 break;
+            case methodCall:
+                exitMethodCall(current);
+                break;
             case integer:
                 exitInt(current);
                 break;
@@ -250,7 +256,7 @@ public abstract class Walker {
 
     protected abstract void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current);
 
-    protected abstract void exitClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current);
+    protected abstract void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current);
 
     protected abstract void exitClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current);
 
@@ -304,6 +310,8 @@ public abstract class Walker {
 
     protected abstract void exitNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current);
 
+    protected abstract void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current);
+
     protected abstract void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
 
     protected abstract void exitBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
@@ -329,6 +337,8 @@ public abstract class Walker {
     protected abstract void enterBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
 
     protected abstract void enterInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
+    protected abstract void enterMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current);
 
     protected abstract void enterNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current);
 
@@ -382,10 +392,10 @@ public abstract class Walker {
 
     protected abstract void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current);
 
-    protected abstract void enterClassDel(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current);
+    protected abstract void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current);
 
-    protected abstract void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node);
+    protected abstract void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current);
 
-    protected abstract void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> node);
+    protected abstract void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current);
 
 }
