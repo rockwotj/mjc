@@ -62,11 +62,11 @@ public class TypeCheckerTest {
                 String baseFileName = file.getName().replaceFirst("[.][^.]+$", "");
                 boolean validProgram = VALID_PROGRAMS.contains(file.getName());
                 TypeCheckerAnalyzer typeChecker = new TypeCheckerAnalyzer(file);
-                // if (validProgram) {
-                //     assertEquals(baseFileName + " should be a valid program", 0, typeChecker.getErrorCount());
-                // } else {
-                //     assertTrue(baseFileName + " should have errors", typeChecker.getErrorCount() > 0);
-                // }
+                 if (validProgram) {
+                     assertEquals(baseFileName + " should be a valid program", 0, typeChecker.getErrorCount());
+                 } else {
+                     assertTrue(baseFileName + " should have errors", typeChecker.getErrorCount() > 0);
+                 }
             }
         }
     }

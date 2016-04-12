@@ -3,8 +3,11 @@ package edu.rosehulman.csse.mjc;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.Walker;
 import edu.rosehulman.csse.mjc.reflect.Class;
+import edu.rosehulman.csse.mjc.reflect.ClassSymbolTable;
+import edu.rosehulman.csse.mjc.reflect.Method;
 import edu.rosehulman.csse.mjc.reflect.SymbolTable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
@@ -15,6 +18,7 @@ public class TypeChecker extends Walker {
     private final List<Class> classes;
     private Stack<String> typeStack = new Stack<>();
     private SymbolTable symbolTable = new SymbolTable();
+    private Class thisClass;
 
     public TypeChecker(AbstractSyntaxNode root, List<Class> classes) {
         super(root);
@@ -25,16 +29,29 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
+
     }
 
     protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
+        thisClass = null;
+        symbolTable = symbolTable.getParent();
     }
 
     protected void exitClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
     }
 
     protected void exitMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
+        // Assert valid return type, top of stack
+        String returnType = current.getContext().type().getText();
+        String returnedType = typeStack.pop();
+        if (!isAssignable(returnType, returnedType)) {
+            throw new RuntimeException("Invalid return type " + returnedType + " is not assignable from " + returnType);
+        }
+        if (!typeStack.isEmpty()) {
+            System.err.println(typeStack.toString());
+        }
         symbolTable = symbolTable.getParent();
+        typeStack.clear();
     }
 
     protected void exitFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
@@ -50,15 +67,11 @@ public class TypeChecker extends Walker {
         String varName = current.getContext().ID().getText();
         String varType = current.getContext().type().getText();
         String resultType = typeStack.pop();
-        if (!Objects.equals(varType, resultType)) {
+        if (!isAssignable(varType, resultType)) {
             throw new RuntimeException("variable " + varName + " expecting type: " + varType + " got type: " + resultType);
         } else {
             symbolTable.addVar(varName, varType);
         }
-        if (!typeStack.isEmpty()) {
-            System.err.println(typeStack.toString());
-        }
-        typeStack.clear();
     }
 
     protected void exitBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
@@ -71,15 +84,29 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
+        System.out.println(current.getContext().getText());
         if (!Objects.equals("boolean", typeStack.pop())) {
             System.err.println("Invalid type for while statement, expected bool");
         }
     }
 
     protected void exitPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
+        String printType = typeStack.pop();
+        if (!printType.equals("int")) {
+            throw new RuntimeException("You can only print integers!");
+        }
+        if (!typeStack.isEmpty()) {
+            throw new RuntimeException("Something broke in exitPrint of type checker...");
+        }
     }
 
     protected void exitAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
+        String var = current.getContext().ID().getText();
+        String type = typeStack.pop();
+        String varType = symbolTable.lookUpVar(var);
+        if (!isAssignable(varType, type)) {
+            throw new RuntimeException("Cannot assign type of " + type + " to type " + varType);
+        }
     }
 
     protected void exitExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current) {
@@ -101,16 +128,14 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        if (!Objects.equals(typeStack.pop(), typeStack.pop())) {
-            System.err.println("Mismatched types for == operator");
-        }
+        typeStack.pop();
+        typeStack.pop();
         typeStack.push("boolean");
     }
 
     protected void exitNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        if (!Objects.equals(typeStack.pop(), typeStack.pop())) {
-            System.err.println("Mismatched types for != operator");
-        }
+        typeStack.pop();
+        typeStack.pop();
         typeStack.push("boolean");
     }
 
@@ -185,20 +210,41 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
-    	/*  TODO
-           -Pop off the number of elements equal to the number of elements we were passed
-   		   -The top of the stack now contains the type of the object calling the function
-   		   -The ID is the method and can be looked up int the class hierarchy
-           -Confirm the method signiture with the types we poped off
-           -Push the return type of the method on the stack */
-   		   System.out.println(current.getContext().getText());
-    	// symbolTable = new SymbolTable(symbolTable);
-    	// List<MiniJavaParser.FormalContext> params = current.getContext().formal();
-    	// for (MiniJavaParser.FormalContext p : params) {
-    	//     String varName = p.ID().getText();
-    	//     String typeName = p.type().getText();
-    	//     symbolTable.addVar(varName, typeName);
-    	// }
+        System.out.println(current.getContext().getText());
+        int numParams = current.getContext().expr().size();
+        List<String> paramList = new ArrayList<>(numParams);
+        for (int i = 0; i < numParams; i++) {
+            paramList.add(0, typeStack.pop());
+        }
+        String classType = typeStack.pop();
+        String methodName = current.getContext().ID().getText();
+        Method method = null;
+        for (Class clazz : classes) {
+            if (clazz.getName().equals(classType)) {
+                for (Method m : clazz.getMethods()) {
+                    if (m.getName().equals(methodName)) {
+                        method = m;
+                        break;
+                    }
+                }
+                if (method == null) {
+                    throw new RuntimeException("Class " + clazz.getName() + " does not have method " + methodName);
+                }
+                break;
+            }
+        }
+        if (method.getParamTypes().size() != numParams) {
+            throw new RuntimeException(methodName + " has an incorrect number of parameters");
+        }
+        for (int i = 0; i < numParams; i++) {
+            String s = paramList.get(i);
+            String s1 = method.getParamTypes().get(i);
+            if (!s.equals(s1)) {
+                throw new RuntimeException(methodName + " has invalid type for parameter number " + i);
+            }
+        }
+        typeStack.push(method.getReturnType());
+        System.out.println(typeStack);
     }
 
     protected void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
@@ -210,11 +256,11 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-    	typeStack.push("null");
+        typeStack.push("null");
     }
 
     protected void exitThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        typeStack.push(thisClass.getName());
     }
 
     protected void exitId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
@@ -230,7 +276,6 @@ public class TypeChecker extends Walker {
         }
         typeStack.push(constructedType);
     }
-
 
 
     protected void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
@@ -327,18 +372,70 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
+        symbolTable = new SymbolTable(symbolTable);
+        String returnType = current.getContext().type().getText();
+        if (!isValidType(returnType)) {
+            throw new RuntimeException("Return type " + returnType + " does not exist!");
+        }
+        for (MiniJavaParser.FormalContext param : current.getContext().formal()) {
+            String type = param.type().getText();
+            if (!isValidType(type)) {
+                throw new RuntimeException("Type " + type + " does not exist!");
+            }
+            symbolTable.addVar(param.ID().getText(), type);
+        }
     }
 
     protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
     }
 
     protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
+        String className = current.getContext().ID(0).getText();
+        for (Class c : classes) {
+            if (c.getName().equals(className)) {
+                thisClass = c;
+                symbolTable = new ClassSymbolTable(symbolTable, c);
+                break;
+            }
+        }
     }
 
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node) {
     }
 
     protected void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> node) {
+    }
+
+    private boolean isPrimative(String name) {
+        return name.equals("int") || name.equals("boolean");
+    }
+
+    private boolean isAssignable(String containerType, String instanceType) {
+        if (isPrimative(containerType)) {
+            return containerType.equals(instanceType);
+        }
+        if (instanceType.equals("null")) {
+            return true;
+        }
+        for (Class c : classes) {
+            if (c.getName().equals(instanceType)) {
+                while (c != null) {
+                    if (c.getName().equals(containerType)) {
+                        return true;
+                    }
+                    c = c.getParent();
+                }
+                break;
+            }
+        }
+        return false;
+    }
+
+    private boolean isValidType(String name) {
+        return name.equals("int") ||
+                name.equals("boolean") ||
+                name.equals("null") ||
+                classes.stream().anyMatch(aClass -> aClass.getName().equals(name));
     }
 
 }

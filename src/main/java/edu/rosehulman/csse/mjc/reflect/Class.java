@@ -7,6 +7,7 @@ public class Class {
     private Map<String, String> fields;
     private List<Method> methods;
     private String name;
+    private Class parent;
 
     public Class(String name) {
         this.name = name;
@@ -19,6 +20,9 @@ public class Class {
     }
 
     public void addFields(String name, String type) {
+        if (fields.containsKey(name)) {
+            throw new RuntimeException("Class " + name + " already has field with that name");
+        }
         this.fields.put(name, type);
     }
 
@@ -33,6 +37,10 @@ public class Class {
     public void setExtends(Class clazz) {
         this.fields.putAll(clazz.fields);
         this.methods.addAll(clazz.methods);
+        this.parent = clazz;
+    }
+    public Class getParent() {
+        return parent;
     }
 
     public String getName() {
