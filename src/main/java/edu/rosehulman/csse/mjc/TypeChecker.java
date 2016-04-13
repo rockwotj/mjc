@@ -48,7 +48,7 @@ public class TypeChecker extends Walker {
             throw new RuntimeException("Invalid return type " + returnedType + " is not assignable from " + returnType);
         }
         if (!typeStack.isEmpty()) {
-            System.err.println(typeStack.toString());
+            throw new RuntimeException(typeStack.toString());
         }
         symbolTable = symbolTable.getParent();
         typeStack.clear();
@@ -79,14 +79,14 @@ public class TypeChecker extends Walker {
 
     protected void exitIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current) {
         if (!Objects.equals("boolean", typeStack.pop())) {
-            System.err.println("Invalid type for while statement, expected bool");
+            throw new RuntimeException("Invalid type for while statement, expected bool");
         }
     }
 
     protected void exitWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
         System.out.println(current.getContext().getText());
         if (!Objects.equals("boolean", typeStack.pop())) {
-            System.err.println("Invalid type for while statement, expected bool");
+            throw new RuntimeException("Invalid type for while statement, expected bool");
         }
     }
 
@@ -115,14 +115,14 @@ public class TypeChecker extends Walker {
 
     protected void exitLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current) {
         if (!Objects.equals("boolean", typeStack.pop()) || !Objects.equals("boolean", typeStack.pop())) {
-            System.err.println("Invalid type for && operator, expected bool");
+            throw new RuntimeException("Invalid type for && operator, expected bool");
         }
         typeStack.push("boolean");
     }
 
     protected void exitLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current) {
         if (!Objects.equals("boolean", typeStack.pop()) || !Objects.equals("boolean", typeStack.pop())) {
-            System.err.println("Invalid type for || operator, expected bool");
+            throw new RuntimeException("Invalid type for || operator, expected bool");
         }
         typeStack.push("boolean");
     }
@@ -141,70 +141,70 @@ public class TypeChecker extends Walker {
 
     protected void exitLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for < operator, expected int");
+            throw new RuntimeException("Invalid type for < operator, expected int");
         }
         typeStack.push("boolean");
     }
 
     protected void exitGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for > operator, expected int");
+            throw new RuntimeException("Invalid type for > operator, expected int");
         }
         typeStack.push("boolean");
     }
 
     protected void exitLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for <= operator, expected int");
+            throw new RuntimeException("Invalid type for <= operator, expected int");
         }
         typeStack.push("boolean");
     }
 
     protected void exitGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for >= operator, expected int");
+            throw new RuntimeException("Invalid type for >= operator, expected int");
         }
         typeStack.push("boolean");
     }
 
     protected void exitPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for + operator, expected int");
+            throw new RuntimeException("Invalid type for + operator, expected int");
         }
         typeStack.push("int");
     }
 
     protected void exitMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for - operator, expected int");
+            throw new RuntimeException("Invalid type for - operator, expected int");
         }
         typeStack.push("int");
     }
 
     protected void exitMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || !Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for * operator, expected int");
+            throw new RuntimeException("Invalid type for * operator, expected int");
         }
         typeStack.push("int");
     }
 
     protected void exitDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
         if (!Objects.equals("int", typeStack.pop()) || (!Objects.equals("int", typeStack.pop()))) {
-            System.err.println("Invalid type for / operator, expected int");
+            throw new RuntimeException("Invalid type for / operator, expected int");
         }
         typeStack.push("int");
     }
 
     protected void exitBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
         if (!Objects.equals("boolean", typeStack.pop())) {
-            System.err.println("Invalid type for ! operator, expected bool");
+            throw new RuntimeException("Invalid type for ! operator, expected bool");
         }
         typeStack.push("boolean");
     }
 
     protected void exitNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
         if (!Objects.equals("int", typeStack.pop())) {
-            System.err.println("Invalid type for - operator, expected int");
+            throw new RuntimeException("Invalid type for - operator, expected int");
         }
         typeStack.push("int");
     }
@@ -387,6 +387,15 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
+        String varName = current.getContext().ID().getText();
+        String varType = current.getContext().type().getText();
+        String resultType = varType;
+        // TODO: This is a hack that essentially just checks that the type exists because nothing is being assigned
+        if (!isAssignable(varType, resultType)) {
+            throw new RuntimeException("Type " + varType + " not defined");
+        } else {
+            symbolTable.addVar(varName, varType);
+        }
     }
 
     protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
