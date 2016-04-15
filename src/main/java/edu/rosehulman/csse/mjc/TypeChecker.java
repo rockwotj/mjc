@@ -29,7 +29,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
-
+        symbolTable = symbolTable.getParent();
     }
 
     protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
@@ -387,6 +387,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
+        // This just needs to check for valid types as they are already added to the table.
         String varName = current.getContext().ID().getText();
         String varType = current.getContext().type().getText();
         String resultType = varType;
@@ -394,7 +395,8 @@ public class TypeChecker extends Walker {
         if (!isAssignable(varType, resultType)) {
             throw new RuntimeException("Type " + varType + " not defined");
         } else {
-            symbolTable.addVar(varName, varType);
+            // This is done in enterClassDecl when we add a new ClassSymbolTable...
+//            symbolTable.addVar(varName, varType);
         }
     }
 
@@ -410,6 +412,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node) {
+        symbolTable = new SymbolTable(symbolTable);
     }
 
     protected void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> node) {

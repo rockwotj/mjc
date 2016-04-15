@@ -13,7 +13,7 @@ import java.util.List;
 public class Compiler {
     public static void main(String[] args) throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/OperatorParsePrecedence.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/TypeCheckerFullTests/testcase00_15.java"));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);

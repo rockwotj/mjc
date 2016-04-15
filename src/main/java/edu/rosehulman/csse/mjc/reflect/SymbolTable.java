@@ -32,6 +32,7 @@ public class SymbolTable {
 
     public void addVar(String name, String type) {
         if (vars.containsKey(name)) {
+            System.out.println(this);
             throw new RuntimeException("Variable " + name + " already has been declared in scope.");
         }
         vars.put(name, type);
@@ -43,6 +44,6 @@ public class SymbolTable {
 
     @Override
     public String toString() {
-        return vars.toString() + " | " + (parent != null ? parent.toString() : "");
+        return vars.toString() + " | " + (parent != null ? parent.toString() : "null");
     }
 }

@@ -12,7 +12,14 @@ class OperatorTest {
         boolean f = -1 > 2 * -4;
         boolean h = true && false || false;
 //         boolean f = true || 2 < 3 && !false;
+
+
+
+
         boolean z = false && 5 > 1 * -3 || true;
+
+
+
         boolean zz = false && (5 > 1 * -3 || true);
         FacMethod mthd = new FacMethod();
          mthd = new FacMethod2();
