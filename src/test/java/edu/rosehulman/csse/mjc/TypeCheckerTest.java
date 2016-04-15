@@ -13,48 +13,44 @@ import static junit.framework.Assert.assertTrue;
 public class TypeCheckerTest {
 
     private static List<String> VALID_PROGRAMS = Arrays.asList(
-        /* TODO: Way over zelous with error checker must go through
-                 each of the commented files and determine why an
-                 error is being thrown when it should not be */
             "testcase00_58.java",
             "testcase00_15.java",
-//            "testcase95-01.java",
+            "testcase95-01.java",
             "testcase00_20.java",
             "testcase97-04.java",
             "testcase00_18.java",
-//            "testcase00_38.java",
-//            "testcase00_72.java",
-//            "testcase96-04.java",
-//            "testcase00_05.java",
-//            "testcase00_66.java",
+            "testcase00_38.java",
+            "testcase00_72.java",
+            "testcase96-04.java",
+            "testcase00_05.java",
+            "testcase00_66.java",
             "testcase00_16.java",
             "testcase00_47.java",
             "testcase00_24.java",
-//            "testcase94-01.java",
-//            "testcase03_01.java",
+            "testcase94-01.java",
+            "testcase03_01.java",
             "testcase00_25.java",
-//            "testcase00_51.java",
-//            "testcase00_95.java",
-//            "testcase00_93.java",
-//            "testcase00_54.java",
-//            "testcase00_96.java",
+            "testcase00_51.java",
+            "testcase00_95.java",
+            "testcase00_93.java",
+            "testcase00_54.java",
+            "testcase00_96.java",
             "testcase00_19.java",
-//            "testcase00_74.java",
+            "testcase00_74.java",
             "testcase00_35.java",
-//            "testcase00_84.java",
-//            "testcase02_04.java",
+            "testcase00_84.java",
+            "testcase02_04.java",
             "testcase00_56.java",
             "testcase04_05.java",
             "testcase00_14.java",
             "testcase00_71.java",
-//            "testcase00_06.java",
+            "testcase00_06.java",
             "testcase00_17.java",
             "testcase00_89.java",
-//            "testcase00_75.java",
-//            "testcase93-01.java",
+            "testcase00_75.java",
+            "testcase93-01.java",
             "testcase00_88.java",
-//            "testcase00_59.java"
-            ""
+            "testcase00_59.java"
     );
 
 

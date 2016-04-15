@@ -46,6 +46,7 @@ public class TypeCheckerAnalyzer {
             TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
             typeCheckingWalker.walk();
         } catch (Exception e){
+            e.printStackTrace();
             typeCheckerErrors += 1;
         }
     }

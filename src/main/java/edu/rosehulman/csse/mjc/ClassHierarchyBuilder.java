@@ -14,7 +14,6 @@ public class ClassHierarchyBuilder extends BaseWalker {
 
     private List<Class> classes = new ArrayList<>();
     private Class current;
-    private String mainClassName = null;
 
     public ClassHierarchyBuilder(AbstractSyntaxNode root) {
         super(root);
@@ -23,9 +22,6 @@ public class ClassHierarchyBuilder extends BaseWalker {
     @Override
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> node) {
         String methodName = node.getContext().ID().getText();
-        if (current.getMethods().stream().anyMatch(m -> m.getName().equals(methodName))) {
-            throw new RuntimeException("Duplicate method name " + methodName + " in " + current.getName());
-        }
         List<String> methodParams = node.getContext().formal()
                 .stream()
                 .map(f -> f.type().getText())
@@ -45,7 +41,7 @@ public class ClassHierarchyBuilder extends BaseWalker {
     @Override
     protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> node) {
         this.current = new Class(node.getContext().ID(0).getText());
-        if (classes.stream().anyMatch(c -> c.getName().equals(current.getName())) || current.getName().equals(mainClassName)) {
+        if (classes.stream().anyMatch(c -> c.getName().equals(current.getName()))) {
             throw new RuntimeException("Duplicate class name: " + current.getName());
         }
         if (node.getContext().ID(1) != null) {
@@ -63,7 +59,7 @@ public class ClassHierarchyBuilder extends BaseWalker {
 
     @Override
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> node) {
-        mainClassName = node.getContext().ID(0).getText();
+        classes.add(new Class(node.getContext().ID(0).getText()));
     }
 
     public List<Class> getClasses() {

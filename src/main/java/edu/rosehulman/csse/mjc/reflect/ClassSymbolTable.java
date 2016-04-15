@@ -6,4 +6,9 @@ public class ClassSymbolTable extends SymbolTable {
         super(symbolTable);
         c.getFields().forEach(this::addVar);
     }
+
+    @Override
+    protected boolean containsVar(String name) {
+        return false;
+    }
 }

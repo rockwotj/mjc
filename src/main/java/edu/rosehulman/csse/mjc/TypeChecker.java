@@ -75,6 +75,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
+        symbolTable = symbolTable.getParent();
     }
 
     protected void exitIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current) {
@@ -94,9 +95,6 @@ public class TypeChecker extends Walker {
         String printType = typeStack.pop();
         if (!printType.equals("int")) {
             throw new RuntimeException("You can only print integers!");
-        }
-        if (!typeStack.isEmpty()) {
-            throw new RuntimeException("Something broke in exitPrint of type checker...");
         }
     }
 
@@ -357,6 +355,7 @@ public class TypeChecker extends Walker {
     }
 
     protected void enterBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
+        symbolTable = new SymbolTable(symbolTable);
     }
 
     protected void enterVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {

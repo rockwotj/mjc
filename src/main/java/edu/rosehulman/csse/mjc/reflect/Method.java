@@ -27,6 +27,17 @@ public class Method {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Method)) {
+            return false;
+        }
+        Method that = (Method) obj;
+        return this.returnType.equals(that.returnType) &&
+                this.name.equals(that.name) &&
+                this.paramTypes.equals(that.paramTypes);
+    }
+
+    @Override
     public String toString() {
         return name + " params: " + paramTypes.toString() + " returns:" + returnType;
     }

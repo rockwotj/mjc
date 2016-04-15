@@ -3,8 +3,11 @@ package edu.rosehulman.csse.mjc.reflect;
 
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 public class Class {
     private Map<String, String> fields;
+    private List<Method> parentMethods;
     private List<Method> methods;
     private String name;
     private Class parent;
@@ -13,6 +16,7 @@ public class Class {
         this.name = name;
         fields = new HashMap<>();
         methods = new ArrayList<>();
+        parentMethods = new ArrayList<>();
     }
 
     public Map<String, String> getFields() {
@@ -27,16 +31,36 @@ public class Class {
     }
 
     public List<Method> getMethods() {
-        return methods;
+        ArrayList<Method> list = new ArrayList<>();
+        list.addAll(methods);
+        List<Method> inhiertedMethods = parentMethods.stream()
+                .filter(m -> methods.stream().noneMatch(method -> Objects.equals(method.getName(), m.getName())))
+                .collect(toList());
+        list.addAll(inhiertedMethods);
+        return list;
     }
 
     public void addMethod(Method method) {
+        boolean dup = methods.stream()
+                .anyMatch(m -> Objects.equals(m.getName(), method.getName()));
+        if (dup) {
+            throw new RuntimeException("Class " + name + " already has method with name: " + method.getName());
+        }
+        Optional<Method> overridenMethod = parentMethods.stream()
+                .filter(m -> Objects.equals(m.getName(), method.getName()))
+                .findFirst();
+        overridenMethod.ifPresent(m -> {
+            if (!Objects.equals(method, m)) {
+                throw new RuntimeException("Overriden method " + method.getName() + " cannot have a different signature.");
+            }
+        });
         this.methods.add(method);
     }
 
     public void setExtends(Class clazz) {
+        // Don't need parent fields because no shadowing is allowed.
         this.fields.putAll(clazz.fields);
-        this.methods.addAll(clazz.methods);
+        this.parentMethods.addAll(clazz.getMethods());
         this.parent = clazz;
     }
     public Class getParent() {

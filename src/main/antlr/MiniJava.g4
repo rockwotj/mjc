@@ -17,7 +17,7 @@ varDecl : type ID  '=' expr ';' ;
 block : '{' (stmt)* '}' ;
 ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
 whileDecl : 'while' '(' expr ')' stmt ;
-print : 'System.out.println' '(' expr')' ';' ;
+print : 'System.out.println' '(' expr ')' ';' ;
 assigment : ID  '=' expr ';' ;
 
 expr : logicalOr ;
@@ -51,7 +51,7 @@ unary :
     | methodCall ;
 
 methodCall :
-      atom DOT ID LPAREN expr (COMMA expr)* RPAREN
+      methodCall DOT ID (LPAREN expr (COMMA expr)* RPAREN | PAREN)
     | atom ;
 
 atom :

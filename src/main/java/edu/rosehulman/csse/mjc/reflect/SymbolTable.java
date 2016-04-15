@@ -31,11 +31,15 @@ public class SymbolTable {
     }
 
     public void addVar(String name, String type) {
-        if (vars.containsKey(name)) {
+        if (containsVar(name)) {
             System.out.println(this);
             throw new RuntimeException("Variable " + name + " already has been declared in scope.");
         }
         vars.put(name, type);
+    }
+
+    protected boolean containsVar(String name) {
+        return vars.containsKey(name) || (parent != null && getParent().containsVar(name));
     }
 
     public SymbolTable getParent() {
