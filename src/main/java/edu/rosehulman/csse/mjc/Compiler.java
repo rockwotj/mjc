@@ -45,6 +45,7 @@ public class Compiler {
         TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
         typeCheckingWalker.walk();
 
+        // Generate Code :)
         CodeGenerator codeGenWalker = new CodeGenerator(ast);
         codeGenWalker.walk();
         String outputIR = codeGenWalker.toString();

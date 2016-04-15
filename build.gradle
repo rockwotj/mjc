@@ -1,4 +1,7 @@
+import org.gradle.internal.os.OperatingSystem
+
 description = "Mini Java Compiler"
+
 apply plugin: 'java'
 apply plugin: 'application'
 apply from: file('gradle/idea.gradle')
@@ -6,14 +9,14 @@ apply from: file('gradle/idea.gradle')
 mainClassName = "edu.rosehulman.csse.mjc.Compiler"
 
 ext.versions = [
-        slf4j: "1.7.2",
+        slf4j  : "1.7.2",
         logback: "1.0.9",
-        junit: "4.10"
+        junit  : "4.10"
 ]
 
 ext.antlr = [
         grammarpackage: "edu.rosehulman.csse.mjc",
-        antlrSource: "src/main/antlr",
+        antlrSource   : "src/main/antlr",
         destinationDir: "src/generated-sources/java"
 ]
 
@@ -43,6 +46,23 @@ task antlrOutputDir << {
     mkdir(antlr.destinationDir)
 }
 
+task runAndExec(dependsOn: run, type: Exec) {
+    // Assumes file is called out.ll in build
+    // Eventually this would be nice to be configurable a flag
+    // to name the input and output, etc. This is good for now.
+    def os = OperatingSystem.current()
+    def osString = null
+    if (os.isWindows()) {
+        throw new GradleException('Windows is not supported')
+    } else if (os.isLinux()) {
+        osString = "ubuntu"
+    } else if (os.isMacOsX()) {
+        osString = "darwin"
+    }
+    println "Running ll file: "
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/lli", "${buildDir}/out.ll"
+}
+
 task generateGrammarSource(dependsOn: antlrOutputDir, type: JavaExec) {
     description = 'Generates Java sources from ANTLR4 grammars.'
 
@@ -55,7 +75,6 @@ task generateGrammarSource(dependsOn: antlrOutputDir, type: JavaExec) {
     classpath = configurations.antlr4
     def pkg = antlr.grammarpackage.replaceAll("\\.", "/")
     args = ["-o", "${antlr.destinationDir}/${pkg}"/*, "-atn"*/, "-visitor", "-package", antlr.grammarpackage, grammars.files].flatten()
-
 }
 
 compileJava {
