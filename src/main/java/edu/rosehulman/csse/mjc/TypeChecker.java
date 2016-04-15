@@ -1,7 +1,7 @@
 package edu.rosehulman.csse.mjc;
 
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
-import edu.rosehulman.csse.mjc.ast.Walker;
+import edu.rosehulman.csse.mjc.ast.BaseWalker;
 import edu.rosehulman.csse.mjc.reflect.Class;
 import edu.rosehulman.csse.mjc.reflect.ClassSymbolTable;
 import edu.rosehulman.csse.mjc.reflect.Method;
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.Stack;
 
 
-public class TypeChecker extends Walker {
+public class TypeChecker extends BaseWalker {
 
     private final List<Class> classes;
     private Stack<String> typeStack = new Stack<>();
@@ -85,7 +85,6 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
-        System.out.println(current.getContext().getText());
         if (!Objects.equals("boolean", typeStack.pop())) {
             throw new RuntimeException("Invalid type for while statement, expected bool");
         }
@@ -108,7 +107,6 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current) {
-        System.out.println(current.getContext().getText());
     }
 
     protected void exitLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current) {
@@ -208,7 +206,6 @@ public class TypeChecker extends Walker {
     }
 
     protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
-        System.out.println(current.getContext().getText());
         int numParams = current.getContext().expr().size();
         List<String> paramList = new ArrayList<>(numParams);
         for (int i = 0; i < numParams; i++) {
@@ -242,7 +239,6 @@ public class TypeChecker extends Walker {
             }
         }
         typeStack.push(method.getReturnType());
-        System.out.println(typeStack);
     }
 
     protected void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {

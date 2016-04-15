@@ -8,12 +8,14 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Compiler {
     public static void main(String[] args) throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/TypeCheckerFullTests/testcase95-01.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleMini.java"));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -43,5 +45,9 @@ public class Compiler {
         TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
         typeCheckingWalker.walk();
 
+        CodeGenerator codeGenWalker = new CodeGenerator(ast);
+        codeGenWalker.walk();
+        String outputIR = codeGenWalker.toString();
+        Files.write(Paths.get("./build/out.ll"), outputIR.getBytes());
     }
 }
