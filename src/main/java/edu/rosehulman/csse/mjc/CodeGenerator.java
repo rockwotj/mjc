@@ -331,7 +331,12 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
-
+        String id = current.getContext().ID().getText();
+        String type = current.getContext().type().getText();
+        ir.allocateStack("%" + id, type);
+        ir.store("%" + id, type, "0");
+        ir.load("%1", type, "%" + id);
+        ir.add("%2", type, "%1", "%1");
     }
 
     @Override
@@ -356,7 +361,6 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
-
     }
 
     @Override

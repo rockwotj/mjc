@@ -22,8 +22,37 @@ public class LlvmIr {
         throw new RuntimeException("Invalid Type!");
     }
 
+    private int getIRTypeSizeInBytes(String returnType) {
+        if (returnType.equals("i32")) {
+            return 4;
+        } else if (returnType.equals("i1")) {
+            return 1;
+        }
+        throw new RuntimeException("Invalid Type!");
+    }
+
     public void print(String valueOrReg) {
         addIRLine("call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i32 0, i32 0), i32 %s)", valueOrReg);
+    }
+
+    public void allocateStack(String reg, String type) {
+        String irType = getIRType(type);
+        addIRLine("%s = alloca %s, align %d", reg, irType, getIRTypeSizeInBytes(irType));
+    }
+
+    public void store(String dstReg, String type, String srcReg) {
+        String irType = getIRType(type);
+        addIRLine("store %s %s, i32* %s, align %d", irType, srcReg, dstReg, getIRTypeSizeInBytes(irType));
+    }
+
+    public void load(String dstReg, String type, String srcReg) {
+        String irType = getIRType(type);
+        addIRLine("%s = load %s, %s* %s, align %s", dstReg, irType, irType, srcReg, getIRTypeSizeInBytes(irType));
+    }
+
+    public void add(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = add nsw %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
     }
 
     public void returnStatment(String valueOrReg, String type) {
