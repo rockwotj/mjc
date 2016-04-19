@@ -3,10 +3,35 @@ package edu.rosehulman.csse.mjc;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.Walker;
 import edu.rosehulman.csse.mjc.ir.LlvmIr;
+import edu.rosehulman.csse.mjc.ir.ValueOrRegister;
+import edu.rosehulman.csse.mjc.reflect.SymbolTable;
+
+import java.util.Stack;
 
 public class CodeGenerator extends Walker {
 
-    LlvmIr ir = new LlvmIr();
+    private LlvmIr ir = new LlvmIr();
+    private Stack<ValueOrRegister> exprRegisters = new Stack<>();
+    private SymbolTable symbolTable = new SymbolTable();
+
+    private String getRegisterCount() {
+        int i = this.registerCounter;
+        this.registerCounter++;
+        return "%" + i;
+
+    }
+
+    private String getLabelCount() {
+        int i = this.labelCounter;
+        this.labelCounter++;
+        return "%" + i;
+
+    }
+
+    private int registerCounter = 1;
+    private int labelCounter = 1;
+
+
 
     public CodeGenerator(AbstractSyntaxNode ast) {
         super(ast);
@@ -20,6 +45,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
+        symbolTable = symbolTable.getParent();
         ir.returnStatment("0", "int");
         ir.endMethod();
     }
@@ -56,12 +82,16 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
-
+        String id = current.getContext().ID().getText();
+        String type = current.getContext().type().getText();
+        ir.allocateStack("%" + id, type);
+        ir.store("%" + id, type, exprRegisters.pop().toString());
+        symbolTable.addVar(id, type);
     }
 
     @Override
     protected void exitBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
-
+        symbolTable = symbolTable.getParent();
     }
 
     @Override
@@ -76,7 +106,8 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
-        ir.print(current.getContext().expr().getText());
+        ValueOrRegister valueOrRegister = exprRegisters.pop();
+        ir.print(valueOrRegister.toString());
     }
 
     @Override
@@ -111,42 +142,66 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.lessThan(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.greaterThan(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.lessThanEqualTo(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.greaterThanEqualTo(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.add(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.minus(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.mult(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        String dstReg = ir.div(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
@@ -201,7 +256,10 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        String id = current.getContext().ID().getText();
+        String type = symbolTable.lookUpVar(id);
+        ValueOrRegister register = new ValueOrRegister(ir.load(getRegisterCount(), type, "%" + id));
+        exprRegisters.push(register);
     }
 
     @Override
@@ -216,12 +274,15 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        String aBool = current.getContext().BOOL().getText();
+        exprRegisters.push(new ValueOrRegister(aBool));
     }
 
     @Override
     protected void enterInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        String anInt = current.getContext().INT().getText();
+        int value = Integer.parseInt(anInt);
+        exprRegisters.push(new ValueOrRegister(value));
     }
 
     @Override
@@ -326,17 +387,11 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
-
+        symbolTable = new SymbolTable(symbolTable);
     }
 
     @Override
     protected void enterVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
-        String id = current.getContext().ID().getText();
-        String type = current.getContext().type().getText();
-        ir.allocateStack("%" + id, type);
-        ir.store("%" + id, type, "0");
-        ir.load("%1", type, "%" + id);
-        ir.add("%2", type, "%1", "%1");
     }
 
     @Override
@@ -370,6 +425,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
+        symbolTable = new SymbolTable(symbolTable);
         ir.startMethod("main", "int");
     }
 

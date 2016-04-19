@@ -19,6 +19,7 @@ public class LlvmIr {
         } else if (returnType.equals("boolean")) {
             return "i1";
         }
+        // TODO: Handle classes.
         throw new RuntimeException("Invalid Type!");
     }
 
@@ -40,19 +41,73 @@ public class LlvmIr {
         addIRLine("%s = alloca %s, align %d", reg, irType, getIRTypeSizeInBytes(irType));
     }
 
-    public void store(String dstReg, String type, String srcReg) {
+    public void store(String dstReg, String type, String srcRegOrValue) {
         String irType = getIRType(type);
-        addIRLine("store %s %s, i32* %s, align %d", irType, srcReg, dstReg, getIRTypeSizeInBytes(irType));
+        addIRLine("store %s %s, %s* %s, align %d", irType, srcRegOrValue, irType, dstReg, getIRTypeSizeInBytes(irType));
     }
 
-    public void load(String dstReg, String type, String srcReg) {
+    public String load(String dstReg, String type, String srcRegOrValue) {
         String irType = getIRType(type);
-        addIRLine("%s = load %s, %s* %s, align %s", dstReg, irType, irType, srcReg, getIRTypeSizeInBytes(irType));
+        addIRLine("%s = load %s, %s* %s, align %s", dstReg, irType, irType, srcRegOrValue, getIRTypeSizeInBytes(irType));
+        return dstReg;
     }
 
-    public void add(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+    public String add(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
         String irType = getIRType(type);
         addIRLine("%s = add nsw %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String mult(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = mul nsw %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String div(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = sdiv nsw %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String minus(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = sub nsw %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String lessThan(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp slt %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String greaterThan(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp sgt %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String greaterThanEqualTo(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp sge %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String lessThanEqualTo(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp sle %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String bang(String dstReg, String type, String srcRegOrVa1) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp ne %s %s, false", dstReg, irType, srcRegOrVa1);
+        return dstReg;
+    }
+
+    public String neg(String dstReg, String type, String srcRegOrVa1) {
+        return minus(dstReg, type, "0", srcRegOrVa1);
     }
 
     public void returnStatment(String valueOrReg, String type) {
