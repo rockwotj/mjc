@@ -46,10 +46,7 @@ task antlrOutputDir << {
     mkdir(antlr.destinationDir)
 }
 
-task runAndExec(dependsOn: run, type: Exec) {
-    // Assumes file is called out.ll in build
-    // Eventually this would be nice to be configurable a flag
-    // to name the input and output, etc. This is good for now.
+def getOsString() {
     def os = OperatingSystem.current()
     def osString = null
     if (os.isWindows()) {
@@ -59,8 +56,37 @@ task runAndExec(dependsOn: run, type: Exec) {
     } else if (os.isMacOsX()) {
         osString = "darwin"
     }
-    println "Running ll file: "
+    return osString;
+}
+
+task runAndExec(dependsOn: run, type: Exec) {
+    // Assumes file is called out.ll in build
+    // Eventually this would be nice to be configurable a flag
+    // to name the input and output, etc. This is good for now.
+    def osString = getOsString()
     commandLine "${projectDir}/src/main/resources/bin/${osString}/lli", "${buildDir}/out.ll"
+}
+
+
+task execLL(type: Exec) {
+    // set the file like
+    // gradle execLL -Pfile=test.ll
+    def osString = getOsString()
+    def f = project.hasProperty('file') ? project.file : "test.ll"
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/lli", "${buildDir}/${f}"
+}
+
+
+task cToLLVM(type: Exec) {
+    // Assumes file is called test.c in test/resources
+    // Eventually this would be nice to be configurable a flag
+    // to name the input and output, etc. This is good for now.
+    def osString = getOsString()
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/clang",
+            "-cc1",
+            "${projectDir}/src/test/resources/test.c",
+            "-emit-llvm",
+            "-o", "${buildDir}/test.ll"
 }
 
 task generateGrammarSource(dependsOn: antlrOutputDir, type: JavaExec) {
