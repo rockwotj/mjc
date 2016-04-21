@@ -206,12 +206,16 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.bang(getRegisterCount(), "boolean", valueOrRegister1.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
-
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.neg(getRegisterCount(), "int", valueOrRegister1.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
