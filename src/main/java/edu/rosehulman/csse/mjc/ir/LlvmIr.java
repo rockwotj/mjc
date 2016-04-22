@@ -110,6 +110,15 @@ public class LlvmIr {
         return minus(dstReg, type, "0", srcRegOrVa1);
     }
 
+    public String or(String val1, String type1, String val2, String type2, String prevBlock, String label1, String label2, String dstReg) {
+
+        return dstReg;
+    }
+
+//    public String and() {
+//
+//    }
+
     public void returnStatment(String valueOrReg, String type) {
         addIRLine("ret %s %s", getIRType(type), valueOrReg);
     }

@@ -21,17 +21,8 @@ public class CodeGenerator extends Walker {
 
     }
 
-    private String getLabelCount() {
-        int i = this.labelCounter;
-        this.labelCounter++;
-        return "%" + i;
-
-    }
-
+    private int lastBlockLabel = 0;
     private int registerCounter = 1;
-    private int labelCounter = 1;
-
-
 
     public CodeGenerator(AbstractSyntaxNode ast) {
         super(ast);

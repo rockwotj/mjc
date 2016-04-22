@@ -19,4 +19,3 @@ int main() {
     printf("%d\n", Test_test(2, &t));
     return 0;
 }
-
