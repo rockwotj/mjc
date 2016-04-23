@@ -3,6 +3,6 @@ class Main {
         int i = 5;
         int a = 3;
         boolean b = true;
-        System.out.println(i + a * 3);
+        System.out.println(i + a);
     }
 }

@@ -1,6 +1,8 @@
 package edu.rosehulman.csse.mjc;
 
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.reflect.Class;
 import org.antlr.v4.runtime.ANTLRFileStream;
@@ -13,9 +15,23 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Compiler {
+
+    @Parameter(names = {"--output", "-o"})
+    String output = "./build/out.ll";
+    @Parameter(names = {"--input", "-i"})
+    String input = "./src/test/resources/SampleMini.java";
+    @Parameter(names = {"--help", "-h"}, help = true)
+    boolean help;
+
     public static void main(String[] args) throws IOException {
+        Compiler main = new Compiler();
+        new JCommander(main, args);
+        main.run();
+    }
+
+    public void run() throws IOException {
         // Get lexer
-        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream("./src/test/resources/SampleMini.java"));
+        MiniJavaLexer lexer = new MiniJavaLexer(new ANTLRFileStream(input));
 
         // Get a list of matched tokens
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -49,6 +65,6 @@ public class Compiler {
         CodeGenerator codeGenWalker = new CodeGenerator(ast);
         codeGenWalker.walk();
         String outputIR = codeGenWalker.toString();
-        Files.write(Paths.get("./build/out.ll"), outputIR.getBytes());
+        Files.write(Paths.get(output), outputIR.getBytes());
     }
 }
