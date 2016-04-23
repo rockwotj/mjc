@@ -3,6 +3,7 @@ dist: trusty
 jdk:
   - oraclejdk8
 script:
+  - src/main/resources/bin/ubuntu/lli -version
   - ./gradlew check -i
 notifications:
   email:
