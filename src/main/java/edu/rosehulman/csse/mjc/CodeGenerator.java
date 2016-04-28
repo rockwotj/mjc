@@ -2,8 +2,7 @@ package edu.rosehulman.csse.mjc;
 
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.Walker;
-import edu.rosehulman.csse.mjc.ir.LlvmIr;
-import edu.rosehulman.csse.mjc.ir.ValueOrRegister;
+import edu.rosehulman.csse.mjc.ir.*;
 import edu.rosehulman.csse.mjc.reflect.SymbolTable;
 
 import java.util.Stack;
@@ -23,11 +22,11 @@ public class CodeGenerator extends Walker {
     private String getNextLabel() {
         String label = "LABEL" + labelCount;
         labelCount++;
-        lastLabel.push(label);
         return label;
     }
 
-    private Stack<String> lastLabel = new Stack<>();
+    private String lastLabel;
+    private Stack<Labels> lastLabels = new Stack<Labels>();
     private int registerCounter = 0;
     private int labelCount = 0;
 
@@ -98,11 +97,12 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
-        String bodyLabel = lastLabel.pop();
-        String testLabel = lastLabel.pop();
-        String exitLabel = lastLabel.pop();
+        WhileLabels labels = (WhileLabels) lastLabels.pop();
+        String testLabel = labels.getTest();
+        String exitLabel = labels.getExit();
         ir.jump(testLabel);
         ir.label(exitLabel);
+        lastLabel = exitLabel;
     }
 
     @Override
@@ -125,26 +125,26 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current) {
-        String label2 = lastLabel.pop();
-        String label1 = lastLabel.pop();
-        String label0 = lastLabel.pop();
-        ir.jump(label2);
-        ir.label(label2);
-        String dstReg = ir.phi(nextRegister(), "true", exprRegisters.pop().toString(),label0, label1);
+        LogicalExpressionLabels labels = (LogicalExpressionLabels) lastLabels.pop();
+        String endLabel = labels.getEnd();
+        String leftLabel = labels.getLeft();
+        ir.jump(endLabel);
+        ir.label(endLabel);
+        String dstReg = ir.phi(nextRegister(), "true", exprRegisters.pop().toString(), leftLabel, lastLabel);
         exprRegisters.push(new ValueOrRegister(dstReg));
-        lastLabel.push(label2);
+        lastLabel = endLabel;
     }
 
     @Override
     protected void exitLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current) {
-        String label2 = lastLabel.pop();
-        String label1 = lastLabel.pop();
-        String label0 = lastLabel.pop();
-        ir.jump(label2);
-        ir.label(label2);
-        String dstReg = ir.phi(nextRegister(), "false", exprRegisters.pop().toString(),label0, label1);
+        LogicalExpressionLabels labels = (LogicalExpressionLabels) lastLabels.pop();
+        String endLabel = labels.getEnd();
+        String leftLabel = labels.getLeft();
+        ir.jump(endLabel);
+        ir.label(endLabel);
+        String dstReg = ir.phi(nextRegister(), "false", exprRegisters.pop().toString(), leftLabel, lastLabel);
         exprRegisters.push(new ValueOrRegister(dstReg));
-        lastLabel.push(label2);
+        lastLabel = endLabel;
     }
 
     @Override
@@ -327,14 +327,12 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void betweenWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current, int count) {
-        String testLabel = lastLabel.pop();
-        String bodyLabel = lastLabel.pop();
-        String exitLabel = lastLabel.pop();
+        WhileLabels labels = (WhileLabels) lastLabels.peek();
+        String bodyLabel = labels.getBody();
+        String exitLabel = labels.getExit();
         ir.branch(exprRegisters.pop().toString(), bodyLabel, exitLabel);
         ir.label(bodyLabel);
-        lastLabel.push(exitLabel);
-        lastLabel.push(testLabel);
-        lastLabel.push(bodyLabel);
+        lastLabel = bodyLabel;
     }
 
     @Override
@@ -354,20 +352,26 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void betweenLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current, int count) {
-        String label1 = getNextLabel();
-        String label2 = getNextLabel();
+        String leftLabel = lastLabel;
+        String rightLabel= getNextLabel();
+        String endLabel = getNextLabel();
         ValueOrRegister prevVal = exprRegisters.pop();
-        ir.branch(prevVal.toString(), label2, label1);
-        ir.label(label1);
+        ir.branch(prevVal.toString(), endLabel, rightLabel);
+        ir.label(rightLabel);
+        lastLabels.push(new LogicalExpressionLabels(leftLabel, rightLabel, endLabel));
+        lastLabel = rightLabel;
     }
 
     @Override
     protected void betweenLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current, int count) {
-        String label1 = getNextLabel();
-        String label2 = getNextLabel();
+        String leftLabel = lastLabel;
+        String rightLabel= getNextLabel();
+        String endLabel = getNextLabel();
         ValueOrRegister prevVal = exprRegisters.pop();
-        ir.branch(prevVal.toString(), label1, label2);
-        ir.label(label1);
+        ir.branch(prevVal.toString(), rightLabel, endLabel);
+        ir.label(rightLabel);
+        lastLabels.push(new LogicalExpressionLabels(leftLabel, rightLabel, endLabel));
+        lastLabel = rightLabel;
     }
 
     @Override
@@ -593,12 +597,13 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
-        // Reserve for the stack
-        getNextLabel();
-        getNextLabel();
-        String label = getNextLabel();
-        ir.jump(label);
-        ir.label(label);
+        String testLabel = getNextLabel();
+        String bodyLabel = getNextLabel();
+        String exitLabel = getNextLabel();
+        ir.jump(testLabel);
+        ir.label(testLabel);
+        lastLabels.push(new WhileLabels(testLabel, bodyLabel, exitLabel));
+        lastLabel = testLabel;
     }
 
     @Override
@@ -647,7 +652,9 @@ public class CodeGenerator extends Walker {
     @Override
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
         symbolTable = new SymbolTable(symbolTable);
-        ir.startMethod("main", "int", getNextLabel());
+        String label = getNextLabel();
+        ir.startMethod("main", "int", label);
+        lastLabel = label;
     }
 
     @Override
