@@ -189,6 +189,186 @@ public abstract class BaseWalker extends Walker {
     }
 
     @Override
+    protected void betweenProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
     protected void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
 
     }

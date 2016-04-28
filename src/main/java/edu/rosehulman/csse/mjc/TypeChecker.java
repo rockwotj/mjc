@@ -124,15 +124,27 @@ public class TypeChecker extends BaseWalker {
     }
 
     protected void exitEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        typeStack.pop();
-        typeStack.pop();
-        typeStack.push("boolean");
+        String type1 = typeStack.pop();
+        String type2 = typeStack.pop();
+        if (!isPrimative(type1) && !isPrimative(type2)) {
+            typeStack.push("boolean");
+        } else if (type1.equals(type2)) {
+            typeStack.push("boolean");
+        } else {
+            throw new RuntimeException("Cannot compare different types");
+        }
     }
 
     protected void exitNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        typeStack.pop();
-        typeStack.pop();
-        typeStack.push("boolean");
+        String type1 = typeStack.pop();
+        String type2 = typeStack.pop();
+        if (!isPrimative(type1) && !isPrimative(type2)) {
+            typeStack.push("boolean");
+        } else if (type1.equals(type2)) {
+            typeStack.push("boolean");
+        } else {
+            throw new RuntimeException("Cannot compare different types");
+        }
     }
 
     protected void exitLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {

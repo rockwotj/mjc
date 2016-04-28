@@ -136,8 +136,123 @@ public abstract class Walker {
         }
         parents.push(current);
         List<AbstractSyntaxNode> children = current.getChildren();
+        int count = 0;
         for (AbstractSyntaxNode child : children) {
             walk(child);
+            if (count == children.size() - 1) {
+                break;
+            }
+            switch (current.getType()) {
+                case program:
+                    betweenProgram(current, count);
+                    break;
+                case mainClassDecl:
+                    betweenMainClassDecl(current, count);
+                    break;
+                case classDecl:
+                    betweenClassDecl(current, count);
+                    break;
+                case classVarDecl:
+                    betweenClassVarDecl(current, count);
+                    break;
+                case methodDecl:
+                    betweenMethodDecl(current, count);
+                    break;
+                case formal:
+                    betweenFormal(current, count);
+                    break;
+                case type:
+                    betweenType(current, count);
+                    break;
+                case stmt:
+                    betweenStmt(current, count);
+                    break;
+                case varDecl:
+                    betweenVarDecl(current, count);
+                    break;
+                case block:
+                    betweenBlock(current, count);
+                    break;
+                case ifElse:
+                    betweenIfElse(current, count);
+                    break;
+                case whileDecl:
+                    betweenWhile(current, count);
+                    break;
+                case print:
+                    betweenPrint(current, count);
+                    break;
+                case assigment:
+                    betweenAssignment(current, count);
+                    break;
+                case expr:
+                    betweenExpr(current, count);
+                    break;
+                case logicalOr:
+                    betweenLogicalOr(current, count);
+                    break;
+                case logicalAnd:
+                    betweenLogicalAnd(current, count);
+                    break;
+                case equals:
+                    betweenEquals(current, count);
+                    break;
+                case notEquals:
+                    betweenNotEquals(current, count);
+                    break;
+                case lessThan:
+                    betweenLessThan(current, count);
+                    break;
+                case greaterThan:
+                    betweenGreaterThan(current, count);
+                    break;
+                case lessThanEquals:
+                    betweenLessThanEquals(current, count);
+                    break;
+                case greaterThanEquals:
+                    betweenGreaterThanEquals(current, count);
+                    break;
+                case plus:
+                    betweenPlus(current, count);
+                    break;
+                case minus:
+                    betweenMinus(current, count);
+                    break;
+                case mult:
+                    betweenMult(current, count);
+                    break;
+                case div:
+                    betweenDiv(current, count);
+                    break;
+                case bang:
+                    betweenBang(current, count);
+                    break;
+                case negative:
+                    betweenNeg(current, count);
+                    break;
+                case methodCall:
+                    betweenMethodCall(current, count);
+                    break;
+                case integer:
+                    betweenInt(current, count);
+                    break;
+                case bool:
+                    betweenBool(current, count);
+                    break;
+                case nil:
+                    betweenNull(current, count);
+                    break;
+                case self:
+                    betweenThis(current, count);
+                    break;
+                case id:
+                    betweenId(current, count);
+                    break;
+                case constructor:
+                    betweenConstructor(current, count);
+                    break;
+            }
+            count++;
         }
         parents.pop();
         switch (current.getType()) {
@@ -252,6 +367,7 @@ public abstract class Walker {
         }
     }
 
+   
     protected abstract void exitProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current);
 
     protected abstract void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current);
@@ -324,6 +440,78 @@ public abstract class Walker {
 
     protected abstract void exitConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
 
+
+    protected abstract void betweenProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current, int count);
+
+    protected abstract void betweenMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current, int count);
+
+    protected abstract void betweenClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current, int count);
+
+    protected abstract void betweenClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current, int count);
+
+    protected abstract void betweenMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current, int count);
+
+    protected abstract void betweenFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current, int count);
+
+    protected abstract void betweenType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current, int count);
+
+    protected abstract void betweenStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current, int count);
+
+    protected abstract void betweenVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current, int count);
+
+    protected abstract void betweenBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current, int count);
+
+    protected abstract void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count);
+
+    protected abstract void betweenWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current, int count);
+
+    protected abstract void betweenPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current, int count);
+
+    protected abstract void betweenAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current, int count);
+
+    protected abstract void betweenExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current, int count);
+
+    protected abstract void betweenLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current, int count);
+
+    protected abstract void betweenLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current, int count);
+
+    protected abstract void betweenEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count);
+
+    protected abstract void betweenNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count);
+
+    protected abstract void betweenLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count);
+
+    protected abstract void betweenGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count);
+
+    protected abstract void betweenLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count);
+
+    protected abstract void betweenGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count);
+
+    protected abstract void betweenPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count);
+
+    protected abstract void betweenMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count);
+
+    protected abstract void betweenMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count);
+
+    protected abstract void betweenDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count);
+
+    protected abstract void betweenBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count);
+
+    protected abstract void betweenNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count);
+
+    protected abstract void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count);
+
+    protected abstract void betweenInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
 
 
     protected abstract void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);

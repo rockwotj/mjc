@@ -9,8 +9,9 @@ public class LlvmIr {
         addIRLine("declare i32 @printf(i8*, ...)");
     }
 
-    public void startMethod(String name, String returnType) {
+    public void startMethod(String name, String returnType, String nextLabel) {
         addIRLine("define %s @%s() {", getIRType(returnType), name);
+        label(nextLabel);
     }
 
     private String getIRType(String returnType) {
@@ -32,8 +33,8 @@ public class LlvmIr {
         throw new RuntimeException("Invalid Type!");
     }
 
-    public void print(String valueOrReg) {
-        addIRLine("call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i32 0, i32 0), i32 %s)", valueOrReg);
+    public void print(String dstReg, String valueOrReg) {
+        addIRLine("%s = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i32 0, i32 0), i32 %s)", dstReg, valueOrReg);
     }
 
     public void allocateStack(String reg, String type) {
@@ -102,7 +103,7 @@ public class LlvmIr {
 
     public String bang(String dstReg, String type, String srcRegOrVa1) {
         String irType = getIRType(type);
-        addIRLine("%s = icmp ne %s %s, false", dstReg, irType, srcRegOrVa1);
+        addIRLine("%s = xor %s %s, true", dstReg, irType, srcRegOrVa1);
         return dstReg;
     }
 
@@ -110,14 +111,41 @@ public class LlvmIr {
         return minus(dstReg, type, "0", srcRegOrVa1);
     }
 
-    public String or(String val1, String type1, String val2, String type2, String prevBlock, String label1, String label2, String dstReg) {
-
+    public String equals(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp eq %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
         return dstReg;
     }
 
-//    public String and() {
-//
-//    }
+    public String notEquals(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
+        String irType = getIRType(type);
+        addIRLine("%s = icmp ne %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        return dstReg;
+    }
+
+    public String zeroExtend(String dstReg, String fromType, String srcRegOrVal, String toType) {
+        String fromIrType = getIRType(fromType);
+        String toIrType = getIRType(toType);
+        addIRLine("%s = zext %s %s to %s", dstReg, fromIrType, srcRegOrVal, toIrType);
+        return dstReg;
+    }
+
+    public void label(String labelName) {
+       addIRLine("%s:", labelName);
+    }
+
+    public void branch(String srcReg, String label1, String label2) {
+        addIRLine("br i1 %s, label %%%s, label %%%s", srcReg, label1, label2);
+    }
+    public void jump(String label1) {
+        addIRLine("br label %%%s", label1);
+    }
+
+    public String phi(String dstReg, String srcRegOrVal1, String srcRegOrVal2,
+                    String label1, String label2) {
+        addIRLine("%s = phi i1 [%s, %%%s], [%s, %%%s]", dstReg, srcRegOrVal1, label1, srcRegOrVal2, label2);
+        return dstReg;
+    }
 
     public void returnStatment(String valueOrReg, String type) {
         addIRLine("ret %s %s", getIRType(type), valueOrReg);

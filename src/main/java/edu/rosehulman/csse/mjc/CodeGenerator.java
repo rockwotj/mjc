@@ -14,19 +14,25 @@ public class CodeGenerator extends Walker {
     private Stack<ValueOrRegister> exprRegisters = new Stack<>();
     private SymbolTable symbolTable = new SymbolTable();
 
-    private String getRegisterCount() {
+    private String nextRegister() {
         int i = this.registerCounter;
         this.registerCounter++;
         return "%" + i;
-
     }
 
-    private int lastBlockLabel = 0;
-    private int registerCounter = 1;
+    private String getNextLabel() {
+        String label = "LABEL" + labelCount;
+        labelCount++;
+        lastLabel.push(label);
+        return label;
+    }
+
+    private Stack<String> lastLabel = new Stack<>();
+    private int registerCounter = 0;
+    private int labelCount = 0;
 
     public CodeGenerator(AbstractSyntaxNode ast) {
         super(ast);
-
     }
 
     @Override
@@ -92,18 +98,24 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
-
+        String bodyLabel = lastLabel.pop();
+        String testLabel = lastLabel.pop();
+        String exitLabel = lastLabel.pop();
+        ir.jump(testLabel);
+        ir.label(exitLabel);
     }
 
     @Override
     protected void exitPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
         ValueOrRegister valueOrRegister = exprRegisters.pop();
-        ir.print(valueOrRegister.toString());
+        ir.print(nextRegister(), valueOrRegister.toString());
     }
 
     @Override
     protected void exitAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
-
+        String var = current.getContext().ID().getText();
+        String type = symbolTable.lookUpVar(var);
+        ir.store("%" + var, type, exprRegisters.pop().toString());
     }
 
     @Override
@@ -113,12 +125,26 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current) {
-
+        String label2 = lastLabel.pop();
+        String label1 = lastLabel.pop();
+        String label0 = lastLabel.pop();
+        ir.jump(label2);
+        ir.label(label2);
+        String dstReg = ir.phi(nextRegister(), "true", exprRegisters.pop().toString(),label0, label1);
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        lastLabel.push(label2);
     }
 
     @Override
     protected void exitLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current) {
-
+        String label2 = lastLabel.pop();
+        String label1 = lastLabel.pop();
+        String label0 = lastLabel.pop();
+        ir.jump(label2);
+        ir.label(label2);
+        String dstReg = ir.phi(nextRegister(), "false", exprRegisters.pop().toString(),label0, label1);
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        lastLabel.push(label2);
     }
 
     @Override
@@ -133,79 +159,79 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.lessThan(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.lessThan(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.greaterThan(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.greaterThan(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.lessThanEqualTo(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.lessThanEqualTo(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.greaterThanEqualTo(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.greaterThanEqualTo(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.add(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.add(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.minus(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.minus(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.mult(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.mult(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
-        String dstReg = ir.div(getRegisterCount(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String dstReg = ir.div(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
-        String dstReg = ir.bang(getRegisterCount(), "boolean", valueOrRegister1.toString());
+        String dstReg = ir.bang(nextRegister(), "boolean", valueOrRegister1.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
     @Override
     protected void exitNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
-        String dstReg = ir.neg(getRegisterCount(), "int", valueOrRegister1.toString());
+        String dstReg = ir.neg(nextRegister(), "int", valueOrRegister1.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
     }
 
@@ -245,6 +271,201 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
+    protected void betweenProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current, int count) {
+        String testLabel = lastLabel.pop();
+        String bodyLabel = lastLabel.pop();
+        String exitLabel = lastLabel.pop();
+        ir.branch(exprRegisters.pop().toString(), bodyLabel, exitLabel);
+        ir.label(bodyLabel);
+        lastLabel.push(exitLabel);
+        lastLabel.push(testLabel);
+        lastLabel.push(bodyLabel);
+    }
+
+    @Override
+    protected void betweenPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current, int count) {
+        String label1 = getNextLabel();
+        String label2 = getNextLabel();
+        ValueOrRegister prevVal = exprRegisters.pop();
+        ir.branch(prevVal.toString(), label2, label1);
+        ir.label(label1);
+    }
+
+    @Override
+    protected void betweenLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current, int count) {
+        String label1 = getNextLabel();
+        String label2 = getNextLabel();
+        ValueOrRegister prevVal = exprRegisters.pop();
+        ir.branch(prevVal.toString(), label1, label2);
+        ir.label(label1);
+    }
+
+    @Override
+    protected void betweenEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
     protected void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
 
     }
@@ -253,7 +474,7 @@ public class CodeGenerator extends Walker {
     protected void enterId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String id = current.getContext().ID().getText();
         String type = symbolTable.lookUpVar(id);
-        ValueOrRegister register = new ValueOrRegister(ir.load(getRegisterCount(), type, "%" + id));
+        ValueOrRegister register = new ValueOrRegister(ir.load(nextRegister(), type, "%" + id));
         exprRegisters.push(register);
     }
 
@@ -372,7 +593,12 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
-
+        // Reserve for the stack
+        getNextLabel();
+        getNextLabel();
+        String label = getNextLabel();
+        ir.jump(label);
+        ir.label(label);
     }
 
     @Override
@@ -421,7 +647,7 @@ public class CodeGenerator extends Walker {
     @Override
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
         symbolTable = new SymbolTable(symbolTable);
-        ir.startMethod("main", "int");
+        ir.startMethod("main", "int", getNextLabel());
     }
 
     @Override

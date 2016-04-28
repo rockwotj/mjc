@@ -63,7 +63,7 @@ def getOsString() {
     return osString;
 }
 
-// Doesn't work on travis :(
+// Compiler test doesn't work on travis :(
 test {
     exclude '**/CompilerTest.class'
 }
