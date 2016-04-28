@@ -92,7 +92,11 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current) {
-
+        IfElseLabels labels = (IfElseLabels) lastLabels.pop();
+        String endLabel = labels.getEnd();
+        ir.jump(endLabel);
+        ir.label(endLabel);
+        lastLabel = endLabel;
     }
 
     @Override
@@ -322,7 +326,23 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count) {
-
+        if (count == 0) { /* After the test */
+            String ifBodyLabel = getNextLabel();
+            String elseBodyLabel= getNextLabel();
+            String endLabel = getNextLabel();
+            ValueOrRegister prevVal = exprRegisters.pop();
+            ir.branch(prevVal.toString(), ifBodyLabel, elseBodyLabel);
+            ir.label(ifBodyLabel);
+            lastLabels.push(new IfElseLabels(ifBodyLabel, elseBodyLabel, endLabel));
+            lastLabel = ifBodyLabel;
+        } else if (count == 1) { /* After the if body */
+            IfElseLabels labels = (IfElseLabels) lastLabels.peek();
+            String elseBodyLabel= labels.getElseBody();
+            String endLabel = labels.getEnd();
+            ir.jump(endLabel);
+            ir.label(elseBodyLabel);
+            lastLabel = elseBodyLabel;
+        }
     }
 
     @Override
