@@ -67,7 +67,7 @@ public class LlvmIr {
 
     public String div(String dstReg, String type, String srcRegOrVa1, String srcRegOrVal2) {
         String irType = getIRType(type);
-        addIRLine("%s = sdiv nsw %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
+        addIRLine("%s = sdiv %s %s, %s", dstReg, irType, srcRegOrVa1, srcRegOrVal2);
         return dstReg;
     }
 

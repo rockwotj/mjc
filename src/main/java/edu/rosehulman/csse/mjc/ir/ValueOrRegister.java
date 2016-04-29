@@ -36,4 +36,20 @@ public class ValueOrRegister {
     public String getValue() {
         return "" + (value == null ? bool : value);
     }
+
+    public boolean isInt() { return value != null; }
+
+    public boolean isBool() { return bool != null; }
+
+    public String getType() {
+        if (this.isRegister()) {
+            return "register";
+        } else {
+            if (this.isInt()) {
+                return "int";
+            } else {
+                return "boolean";
+            }
+        }
+    }
 }

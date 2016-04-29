@@ -25,6 +25,14 @@ public class CodeGenerator extends Walker {
         return label;
     }
 
+    private String getValOrRegType(ValueOrRegister valOrReg) {
+        if (valOrReg.isRegister()) {
+            return symbolTable.lookUpVar(valOrReg.toString());
+        } else {
+            return valOrReg.getType();
+        }
+    }
+
     private String lastLabel;
     private Stack<Labels> lastLabels = new Stack<Labels>();
     private int registerCounter = 0;
@@ -136,6 +144,7 @@ public class CodeGenerator extends Walker {
         ir.label(endLabel);
         String dstReg = ir.phi(nextRegister(), "true", exprRegisters.pop().toString(), leftLabel, lastLabel);
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
         lastLabel = endLabel;
     }
 
@@ -148,17 +157,30 @@ public class CodeGenerator extends Walker {
         ir.label(endLabel);
         String dstReg = ir.phi(nextRegister(), "false", exprRegisters.pop().toString(), leftLabel, lastLabel);
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
         lastLabel = endLabel;
     }
 
     @Override
     protected void exitEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-
+        // TODO: Handle objects
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String type = getValOrRegType(valueOrRegister1);
+        String dstReg = ir.equals(nextRegister(), type, valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
     protected void exitNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-
+        // TODO: Handle objects
+        ValueOrRegister valueOrRegister2 = exprRegisters.pop();
+        ValueOrRegister valueOrRegister1 = exprRegisters.pop();
+        String type = getValOrRegType(valueOrRegister1);
+        String dstReg = ir.notEquals(nextRegister(), type, valueOrRegister1.toString(), valueOrRegister2.toString());
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
@@ -167,6 +189,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.lessThan(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
@@ -175,6 +198,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.greaterThan(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
@@ -183,6 +207,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.lessThanEqualTo(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
@@ -191,6 +216,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.greaterThanEqualTo(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
@@ -199,6 +225,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.add(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "int");
     }
 
     @Override
@@ -207,6 +234,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.minus(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "int");
     }
 
     @Override
@@ -215,6 +243,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.mult(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "int");
     }
 
     @Override
@@ -223,6 +252,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.div(nextRegister(), "int", valueOrRegister1.toString(), valueOrRegister2.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "int");
     }
 
     @Override
@@ -230,6 +260,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.bang(nextRegister(), "boolean", valueOrRegister1.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
@@ -237,6 +268,7 @@ public class CodeGenerator extends Walker {
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
         String dstReg = ir.neg(nextRegister(), "int", valueOrRegister1.toString());
         exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, "int");
     }
 
     @Override
@@ -498,8 +530,9 @@ public class CodeGenerator extends Walker {
     protected void enterId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String id = current.getContext().ID().getText();
         String type = symbolTable.lookUpVar(id);
-        ValueOrRegister register = new ValueOrRegister(ir.load(nextRegister(), type, "%" + id));
-        exprRegisters.push(register);
+        String dstReg = nextRegister();
+        exprRegisters.push(new ValueOrRegister(ir.load(dstReg, type, "%" + id)));
+        symbolTable.addVar(dstReg, type);
     }
 
     @Override
@@ -515,7 +548,8 @@ public class CodeGenerator extends Walker {
     @Override
     protected void enterBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String aBool = current.getContext().BOOL().getText();
-        exprRegisters.push(new ValueOrRegister(aBool));
+        boolean bool = Boolean.parseBoolean(aBool);
+        exprRegisters.push(new ValueOrRegister(bool));
     }
 
     @Override
