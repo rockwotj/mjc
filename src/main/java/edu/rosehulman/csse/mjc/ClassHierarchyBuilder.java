@@ -5,10 +5,7 @@ import edu.rosehulman.csse.mjc.ast.BaseWalker;
 import edu.rosehulman.csse.mjc.reflect.Class;
 import edu.rosehulman.csse.mjc.reflect.Method;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class ClassHierarchyBuilder extends BaseWalker {
@@ -27,7 +24,10 @@ public class ClassHierarchyBuilder extends BaseWalker {
                 .stream()
                 .collect(Collectors.toMap(
                         f -> f.ID().getText(),
-                        f -> f.type().getText()));
+                        f -> f.type().getText(),
+                        (u, v) -> { throw new RuntimeException("Duplicate method param for " + methodName); },
+                        LinkedHashMap::new
+                ));
         String returnType = node.getContext().type().getText();
         Method method = new Method(returnType, methodParams, methodName);
         this.current.addMethod(method);

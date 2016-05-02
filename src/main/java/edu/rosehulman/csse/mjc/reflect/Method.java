@@ -25,7 +25,7 @@ public class Method {
     }
 
     public List<String> getParamTypes() {
-        List<String> paramTypes = new ArrayList<String>();
+        List<String> paramTypes = new ArrayList<>();
         paramTypes.addAll(params.values());
         return paramTypes;
     }
