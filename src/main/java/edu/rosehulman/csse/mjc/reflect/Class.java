@@ -6,7 +6,7 @@ import java.util.*;
 import static java.util.stream.Collectors.toList;
 
 public class Class {
-    private Map<String, String> fields;
+    private LinkedHashMap<String, String> fields;
     private List<Method> parentMethods;
     private List<Method> methods;
     private String name;
@@ -14,13 +14,24 @@ public class Class {
 
     public Class(String name) {
         this.name = name;
-        fields = new HashMap<>();
+        fields = new LinkedHashMap<>();
         methods = new ArrayList<>();
         parentMethods = new ArrayList<>();
     }
 
-    public Map<String, String> getFields() {
+    public LinkedHashMap<String, String> getFields() {
         return fields;
+    }
+
+    public int getFieldIndex(String name) {
+        int index = 0;
+        for (Map.Entry<String, String> entry : fields.entrySet()) {
+            if (entry.getKey().equals(name)) {
+                return index;
+            }
+            index++;
+        }
+        throw new RuntimeException("Name " + name + " not in class " + this.name);
     }
 
     public void addFields(String name, String type) {

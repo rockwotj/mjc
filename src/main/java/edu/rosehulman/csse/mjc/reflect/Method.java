@@ -1,16 +1,18 @@
 package edu.rosehulman.csse.mjc.reflect;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Method {
 
     private String returnType;
-    private List<String> paramTypes;
+    private Map<String, String> params;
     private String name;
 
-    public Method(String returnType, List<String> paramTypes, String name) {
+    public Method(String returnType, Map<String, String> params, String name) {
         this.returnType = returnType;
-        this.paramTypes = paramTypes;
+        this.params = params;
         this.name = name;
     }
 
@@ -18,7 +20,13 @@ public class Method {
         return returnType;
     }
 
+    public Map<String, String> getParams() {
+        return params;
+    }
+
     public List<String> getParamTypes() {
+        List<String> paramTypes = new ArrayList<String>();
+        paramTypes.addAll(params.values());
         return paramTypes;
     }
 
@@ -34,11 +42,11 @@ public class Method {
         Method that = (Method) obj;
         return this.returnType.equals(that.returnType) &&
                 this.name.equals(that.name) &&
-                this.paramTypes.equals(that.paramTypes);
+                this.params.equals(that.params);
     }
 
     @Override
     public String toString() {
-        return name + " params: " + paramTypes.toString() + " returns:" + returnType;
+        return name + " params: " + params.toString() + " returns:" + returnType;
     }
 }

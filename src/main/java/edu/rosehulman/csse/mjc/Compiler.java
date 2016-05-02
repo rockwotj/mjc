@@ -62,7 +62,7 @@ public class Compiler {
         typeCheckingWalker.walk();
 
         // Generate Code :)
-        CodeGenerator codeGenWalker = new CodeGenerator(ast);
+        CodeGenerator codeGenWalker = new CodeGenerator(ast, classList);
         codeGenWalker.walk();
         String outputIR = codeGenWalker.toString();
         Files.write(Paths.get(output), outputIR.getBytes());

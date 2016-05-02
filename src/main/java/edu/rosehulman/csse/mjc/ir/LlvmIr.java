@@ -1,16 +1,38 @@
 package edu.rosehulman.csse.mjc.ir;
 
+import edu.rosehulman.csse.mjc.reflect.Class;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 public class LlvmIr {
 
     private StringBuilder outputIR = new StringBuilder();
 
-    public LlvmIr() {
+    public LlvmIr(List<Class> classList) {
         addIRLine("@.str = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1");
         addIRLine("declare i32 @printf(i8*, ...)");
+        addIRLine("declare noalias i8* @calloc(i64, i64)");
+        for (Class clazz : classList) {
+            List<String> fieldTypes = new ArrayList<>();
+            fieldTypes.addAll(clazz.getFields().values());
+            clazz(clazz.getName(), fieldTypes);
+        }
+
     }
 
-    public void startMethod(String name, String returnType, String nextLabel) {
-        addIRLine("define %s @%s() {", getIRType(returnType), name);
+    public void startMethod(String name, Map<String, String> params, String returnType, String nextLabel) {
+        addIR("define %s @%s(", getIRType(returnType), name);
+        int index = 0;
+        for (Map.Entry<String, String> param : params.entrySet()) {
+            addIR("%s %%%s", getIRType(param.getValue()), param.getKey());
+            index++;
+            if (index != params.size()) {
+                addIR(", ");
+            }
+        }
+        addIRLine(") {");
         label(nextLabel);
     }
 
@@ -19,9 +41,9 @@ public class LlvmIr {
             return "i32";
         } else if (returnType.equals("boolean")) {
             return "i1";
+        } else {
+            return "%class." + returnType + "*";
         }
-        // TODO: Handle classes.
-        throw new RuntimeException("Invalid Type!");
     }
 
     private int getIRTypeSizeInBytes(String returnType) {
@@ -29,8 +51,9 @@ public class LlvmIr {
             return 4;
         } else if (returnType.equals("i1")) {
             return 1;
+        } else {
+            return 8;
         }
-        throw new RuntimeException("Invalid Type!");
     }
 
     public void print(String dstReg, String valueOrReg) {
@@ -147,6 +170,34 @@ public class LlvmIr {
         return dstReg;
     }
 
+    public String clazz(String className, List<String> types) {
+        addIR("%%class.%s = type { ", className);
+        for (int i = 0; i < types.size(); i++) {
+            String type = types.get(i);
+            addIR("%s", getIRType(type));
+            if (i != types.size() - 1) {
+                addIR(", ");
+            }
+        }
+        addIRLine(" }");
+        return getIRType(className);
+    }
+
+    public String newConstruct(String tmpReg, String dstReg, Class clazz) {
+        int numElements = clazz.getFields().size();
+        int maxSize = 0;
+        for (Map.Entry<String, String> entry : clazz.getFields().entrySet()) {
+            String irType = getIRType(entry.getValue());
+            int irSize = getIRTypeSizeInBytes(irType);
+            if (maxSize < irSize) {
+                maxSize = irSize;
+            }
+        }
+        addIRLine("%s = call noalias i8* @calloc(i64 1, i64 %d)", tmpReg, maxSize * numElements);
+        addIRLine("%s = bitcast i8* %s to %s", dstReg, tmpReg, getIRType(clazz.getName()));
+        return dstReg;
+    }
+
     public void returnStatment(String valueOrReg, String type) {
         addIRLine("ret %s %s", getIRType(type), valueOrReg);
     }
@@ -157,6 +208,9 @@ public class LlvmIr {
 
     private void addIRLine(String ir, Object... args) {
         outputIR.append(String.format(ir, args)).append("\n");
+    }
+    private void addIR(String ir, Object... args) {
+        outputIR.append(String.format(ir, args));
     }
 
     @Override

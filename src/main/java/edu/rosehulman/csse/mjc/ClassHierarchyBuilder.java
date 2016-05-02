@@ -7,6 +7,7 @@ import edu.rosehulman.csse.mjc.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -22,10 +23,11 @@ public class ClassHierarchyBuilder extends BaseWalker {
     @Override
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> node) {
         String methodName = node.getContext().ID().getText();
-        List<String> methodParams = node.getContext().formal()
+        Map<String, String> methodParams = node.getContext().formal()
                 .stream()
-                .map(f -> f.type().getText())
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(
+                        f -> f.ID().getText(),
+                        f -> f.type().getText()));
         String returnType = node.getContext().type().getText();
         Method method = new Method(returnType, methodParams, methodName);
         this.current.addMethod(method);

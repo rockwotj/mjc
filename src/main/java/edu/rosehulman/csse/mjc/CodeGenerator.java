@@ -3,15 +3,21 @@ package edu.rosehulman.csse.mjc;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.Walker;
 import edu.rosehulman.csse.mjc.ir.*;
+import edu.rosehulman.csse.mjc.reflect.Class;
+import edu.rosehulman.csse.mjc.reflect.Method;
 import edu.rosehulman.csse.mjc.reflect.SymbolTable;
+import org.antlr.v4.runtime.misc.Pair;
 
-import java.util.Stack;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class CodeGenerator extends Walker {
 
-    private LlvmIr ir = new LlvmIr();
+    private final List<Class> classList;
+    private LlvmIr ir;
     private Stack<ValueOrRegister> exprRegisters = new Stack<>();
     private SymbolTable symbolTable = new SymbolTable();
+    private Class thisClass;
 
     private String nextRegister() {
         int i = this.registerCounter;
@@ -38,8 +44,10 @@ public class CodeGenerator extends Walker {
     private int registerCounter = 0;
     private int labelCount = 0;
 
-    public CodeGenerator(AbstractSyntaxNode ast) {
+    public CodeGenerator(AbstractSyntaxNode ast, List<Class> classList) {
         super(ast);
+        this.classList = classList;
+        ir = new LlvmIr(classList);
     }
 
     @Override
@@ -66,7 +74,11 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
-
+        ValueOrRegister valueOrRegister = exprRegisters.pop();
+        String type = getValOrRegType(valueOrRegister);
+        symbolTable = symbolTable.getParent();
+        ir.returnStatment(valueOrRegister.toString(), type);
+        ir.endMethod();
     }
 
     @Override
@@ -523,7 +535,11 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        String className = current.getContext().ID().getText();
+        Class clazz = getClass(className);
+        String dstReg = ir.newConstruct(nextRegister(), nextRegister(), clazz);
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, className);
     }
 
     @Override
@@ -691,6 +707,35 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
+        String methodName = current.getContext().ID().getText();
+        Method method = thisClass.getMethods()
+                .stream()
+                .filter(method1 ->  method1.getName().equals(methodName))
+                .findFirst()
+                .get();
+        String mangledName = thisClass.getName() + "_" + method.getName();
+        symbolTable = new SymbolTable(symbolTable);
+        method.getParams().entrySet()
+                .stream()
+                .forEach(e -> symbolTable.addVar(e.getKey(), e.getValue()));
+        LinkedHashMap<String, String> params = new LinkedHashMap<>();
+        params.putAll(method.getParams());
+        params.put("this", thisClass.getName());
+        Map<String, String> mangledParams = params.entrySet()
+                .stream()
+                .map(e -> new Pair<>("$" + e.getKey(), e.getValue()))
+                .collect(Collectors.toMap(e -> e.a, e -> e.b));
+
+        // Reset labels and registers
+        labelCount = 0;
+        registerCounter = 0;
+        ir.startMethod(mangledName, mangledParams, method.getReturnType(), getNextLabel());
+        params.forEach((name, type) -> {
+            String mName = "%$" + name;
+            name = "%" + name;
+            ir.allocateStack(name, type);
+            ir.store(name, type, mName);
+        });
 
     }
 
@@ -700,20 +745,32 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
-
+        String clazzName = current.getContext().ID(0).getText();
+        thisClass = getClass(clazzName);
     }
 
     @Override
     protected void enterMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
         symbolTable = new SymbolTable(symbolTable);
         String label = getNextLabel();
-        ir.startMethod("main", "int", label);
+        ir.startMethod("main", Collections.emptyMap(), "int", label);
         lastLabel = label;
     }
 
     @Override
     protected void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current) {
 
+    }
+
+    private Class getClass(String name) {
+        Class result = null;
+        for (Class clazz : classList) {
+            if (clazz.getName().equals(name)) {
+                result = clazz;
+                break;
+            }
+        }
+        return result;
     }
 
     @Override
