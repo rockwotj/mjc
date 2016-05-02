@@ -11,7 +11,7 @@ mainClassName = "edu.rosehulman.csse.mjc.Compiler"
 ext.versions = [
         slf4j  : "1.7.2",
         logback: "1.0.9",
-        junit  : "4.10"
+        junit  : "4.12"
 ]
 
 ext.antlr = [
@@ -63,9 +63,11 @@ def getOsString() {
     return osString;
 }
 
+if (System.getenv("CI") != null) {
 // Compiler test doesn't work on travis :(
-test {
-    exclude '**/CompilerTest.class'
+    test {
+        exclude '**/CompilerTest.class'
+    }
 }
 
 task runAndExec(dependsOn: run, type: Exec) {

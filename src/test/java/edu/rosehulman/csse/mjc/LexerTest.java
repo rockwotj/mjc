@@ -24,7 +24,7 @@ public class LexerTest {
     private static final String INPUT_EXT = ".java";
     private static final String OUTPUT_EXT = ".out";
 
-    @Parameterized.Parameters()
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<File[]> testCases() {
         File folder = new File(INPUT_FOLDER);
         List<File[]> fileCollection = new ArrayList<>();

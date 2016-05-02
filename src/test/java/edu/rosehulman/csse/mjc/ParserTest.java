@@ -26,7 +26,7 @@ public class ParserTest {
             "testcase00_16.java");
 
 
-    @Parameterized.Parameters()
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<File[]> testCases() {
         File folder = new File(INPUT_FOLDER);
         List<File[]> fileCollection = new ArrayList<>();

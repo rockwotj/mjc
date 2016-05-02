@@ -27,13 +27,13 @@ public class CompilerTest {
 
     private static final boolean SIMPLE_TEST = true;
 
-    @Parameterized.Parameters()
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<File[]> testCases() {
         List<File[]> fileCollection = new ArrayList<>();
         if (SIMPLE_TEST) {
             File input = new File(INPUT_FOLDER + "testcase97-03" + INPUT_EXT);
             File output = new File(OUTPUT_FOLDER + "testcase97-03" + OUTPUT_EXT);
-            fileCollection.add(new File[] {input, output});
+            fileCollection.add(new File[]{input, output});
             return fileCollection;
         }
         File folder = new File(INPUT_FOLDER);
