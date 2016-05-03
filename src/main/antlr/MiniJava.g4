@@ -39,11 +39,11 @@ relation :
     | plusOrMinus ;
 
 plusOrMinus :
-      multOrDiv (ADD|SUB) plusOrMinus
+      plusOrMinus (ADD|SUB) multOrDiv
     | multOrDiv ;
 
 multOrDiv :
-      unary (MUL|DIV) multOrDiv
+      multOrDiv (MUL|DIV) unary
     | unary ;
 
 unary :
