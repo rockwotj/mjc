@@ -25,7 +25,7 @@ public class CompilerTest {
     private static final String INPUT_EXT = ".java";
     private static final String OUTPUT_EXT = ".out";
 
-    private static final boolean SIMPLE_TEST = true;
+    private static final boolean SIMPLE_TEST = false;
 
     @Parameterized.Parameters(name = "{0}")
     public static Collection<File[]> testCases() {

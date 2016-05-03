@@ -40,9 +40,11 @@ public class CodeGenerator extends Walker {
     }
 
     private String lastLabel;
-    private Stack<Labels> lastLabels = new Stack<Labels>();
+    private Stack<Labels> lastLabels = new Stack<>();
     private int registerCounter = 0;
     private int labelCount = 0;
+
+    private Stack<MethodCall> methodArgs = new Stack<>();
 
     public CodeGenerator(AbstractSyntaxNode ast, List<Class> classList) {
         super(ast);
@@ -285,7 +287,11 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
-
+        betweenMethodCall(current, current.getChildren().size() - 1);
+        MethodCall methodCall = methodArgs.pop();
+        String dstReg = ir.methodCall(nextRegister(), methodCall.getName(), methodCall.getMethod().getReturnType(), methodCall.getArguments());
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, methodCall.getMethod().getReturnType());
     }
 
     @Override
@@ -340,7 +346,6 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void betweenMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current, int count) {
-
     }
 
     @Override
@@ -500,7 +505,30 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count) {
-
+        MethodCall methodCall = methodArgs.peek();
+        String type;
+        switch (count) {
+            case 0:
+                // Get reciever
+                ValueOrRegister receiverReg = exprRegisters.pop();
+                type = symbolTable.lookUpVar(receiverReg.toString());
+                methodCall.addArg(receiverReg.toString(), type);
+                methodCall.setReceiver(getClass(type));
+                List<Method> methods = methodCall.getReceiver().getMethods();
+                for (Method m : methods) {
+                    if (m.getName().equals(current.getContext().ID().getText())) {
+                        methodCall.setMethod(m);
+                        break;
+                    }
+                }
+                break;
+            default:
+                // Get param
+                ValueOrRegister arg = exprRegisters.pop();
+                type = getValOrRegType(arg);
+                methodCall.addArg(arg.toString(), type);
+                break;
+        }
     }
 
     @Override
@@ -553,12 +581,15 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        String type = thisClass.getName();
+        String dstReg = nextRegister();
+        exprRegisters.push(new ValueOrRegister(ir.load(dstReg, type, "%this")));
+        symbolTable.addVar(dstReg, type);
     }
 
     @Override
     protected void enterNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
+        exprRegisters.push(new ValueOrRegister());
     }
 
     @Override
@@ -577,7 +608,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
-
+        methodArgs.push(new MethodCall());
     }
 
     @Override
@@ -719,8 +750,8 @@ public class CodeGenerator extends Walker {
                 .stream()
                 .forEach(e -> symbolTable.addVar(e.getKey(), e.getValue()));
         LinkedHashMap<String, String> params = new LinkedHashMap<>();
-        params.putAll(method.getParams());
         params.put("this", thisClass.getName());
+        params.putAll(method.getParams());
         Map<String, String> mangledParams = params.entrySet()
                 .stream()
                 .map(e -> new Pair<>("$" + e.getKey(), e.getValue()))

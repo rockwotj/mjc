@@ -1,6 +1,7 @@
 package edu.rosehulman.csse.mjc.ir;
 
 import edu.rosehulman.csse.mjc.reflect.Class;
+import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -195,6 +196,20 @@ public class LlvmIr {
         }
         addIRLine("%s = call noalias i8* @calloc(i64 1, i64 %d)", tmpReg, maxSize * numElements);
         addIRLine("%s = bitcast i8* %s to %s", dstReg, tmpReg, getIRType(clazz.getName()));
+        return dstReg;
+    }
+
+    public String methodCall(String dstReg, String methodName, String returnType, List<Pair<String, String>> args) {
+        addIR("%s = call %s @%s(", dstReg, getIRType(returnType), methodName);
+        int i = 0;
+        for (Pair<String, String> arg : args) {
+            addIR("%s %s", getIRType(arg.b), arg.a);
+            i++;
+            if (i != args.size()) {
+               addIR(", ");
+            }
+        }
+        addIRLine(")");
         return dstReg;
     }
 

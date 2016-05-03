@@ -7,6 +7,8 @@ public class ValueOrRegister {
     private Boolean bool;
     private String register;
 
+    public ValueOrRegister() {}
+
     public ValueOrRegister(int value) {
         this.value = value;
     }
@@ -34,12 +36,16 @@ public class ValueOrRegister {
 
 
     public String getValue() {
-        return "" + (value == null ? bool : value);
+        return "" + (value == null ? bool == null ? "null" : bool : value);
     }
 
     public boolean isInt() { return value != null; }
 
     public boolean isBool() { return bool != null; }
+
+    public boolean isNull() {
+        return value == null && bool == null && register == null;
+    }
 
     public String getType() {
         if (this.isRegister()) {
@@ -47,8 +53,10 @@ public class ValueOrRegister {
         } else {
             if (this.isInt()) {
                 return "int";
-            } else {
+            } else if (this.isBool()) {
                 return "boolean";
+            } else {
+                return "null";
             }
         }
     }
