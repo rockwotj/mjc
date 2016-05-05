@@ -47,7 +47,7 @@ multOrDiv :
     | unary ;
 
 unary :
-      (BANG|SUB) expr
+     (BANG|SUB) unary
     | methodCall ;
 
 methodCall :

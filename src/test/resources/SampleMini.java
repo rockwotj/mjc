@@ -3,6 +3,8 @@ class Main {
         Bar f = new Bar();
         int ignored = f.init();
         System.out.println(f.printAnother());
+        System.out.println(-(2 + 3 * 6));
+        System.out.println(-f.printAnother());
     }
 }
 
@@ -25,6 +27,6 @@ class Foo {
 class Bar extends Foo {
     public int printAnother() {
         System.out.println(a + 3);
-        return 0;
+        return 10;
     }
 }
