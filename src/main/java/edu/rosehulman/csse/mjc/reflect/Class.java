@@ -51,6 +51,14 @@ public class Class {
         return list;
     }
 
+    public Class getMethodParent(Method method) {
+        if (this.methods.contains(method)) {
+            return this;
+        } else {
+            return parent.getMethodParent(method);
+        }
+    }
+
     public void addMethod(Method method) {
         boolean dup = methods.stream()
                 .anyMatch(m -> Objects.equals(m.getName(), method.getName()));

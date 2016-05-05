@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class SymbolTable {
 
-    private Map<String, String> vars = new HashMap<>();
+    protected Map<String, String> vars = new HashMap<>();
     private SymbolTable parent = null;
 
     public SymbolTable() {
@@ -28,6 +28,10 @@ public class SymbolTable {
         } else {
             throw new RuntimeException("Variable " + name + " does not exist within scope.");
         }
+    }
+
+    public boolean isClassVar(String name) {
+        return !vars.containsKey(name) && parent.isClassVar(name);
     }
 
     public void addVar(String name, String type) {

@@ -11,4 +11,9 @@ public class ClassSymbolTable extends SymbolTable {
     protected boolean containsVar(String name) {
         return false;
     }
+
+    @Override
+    public boolean isClassVar(String name) {
+        return vars.containsKey(name);
+    }
 }

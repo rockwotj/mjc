@@ -1,21 +1,30 @@
 class Main {
     public static void main(String[] args) {
-        Foo f = new Foo();
-        Foo ff = null;
-        System.out.println(f.bar(4));
+        Bar f = new Bar();
+        int ignored = f.init();
+        System.out.println(f.printAnother());
     }
 }
 
 class Foo {
-    public int bar(int c) {
-        return c + c;
+
+    int a;
+
+    public int init() {
+        a = 42;
+        return 0;
     }
 
-    public Foo baz() {
-        return null;
+    public int print() {
+        System.out.println(a);
+        return 0;
     }
 
-    public boolean isNine(int a, int b, int c) {
-        return a + b + c == 9;
+}
+
+class Bar extends Foo {
+    public int printAnother() {
+        System.out.println(a + 3);
+        return 0;
     }
 }

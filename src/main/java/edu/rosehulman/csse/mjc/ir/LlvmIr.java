@@ -232,4 +232,25 @@ public class LlvmIr {
     public String toString() {
         return outputIR.toString();
     }
+
+    public String getClassElement(String tmpReg, String dstReg, String resultType, String classType, String classReg, int index) {
+        String classPointer = getIRType(classType);
+        classType = classPointer.substring(0, classPointer.length() - 1);
+        addIRLine("%s = getelementptr inbounds %s, %s %s, i32 0, i32 %d", tmpReg, classType, classPointer, classReg, index);
+        return load(dstReg, resultType, tmpReg);
+    }
+
+    public void setClassElement(String tmpReg, String srcReg, String resultType, String classType, String classReg, int index) {
+        String classPointer = getIRType(classType);
+        classType = classPointer.substring(0, classPointer.length() - 1);
+        addIRLine("%s = getelementptr inbounds %s, %s %s, i32 0, i32 %d", tmpReg, classType, classPointer, classReg, index);
+        store(tmpReg, resultType, srcReg);
+    }
+
+    public String cast(String dstReg, String srcReg, String toType, String fromType) {
+        toType = getIRType(toType);
+        fromType = getIRType(fromType);
+        addIRLine("%s = bitcast %s %s to %s", dstReg, fromType, srcReg, toType);
+        return dstReg;
+    }
 }

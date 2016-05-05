@@ -4,6 +4,7 @@ import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
 import edu.rosehulman.csse.mjc.ast.Walker;
 import edu.rosehulman.csse.mjc.ir.*;
 import edu.rosehulman.csse.mjc.reflect.Class;
+import edu.rosehulman.csse.mjc.reflect.ClassSymbolTable;
 import edu.rosehulman.csse.mjc.reflect.Method;
 import edu.rosehulman.csse.mjc.reflect.SymbolTable;
 import org.antlr.v4.runtime.misc.Pair;
@@ -66,7 +67,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
-
+        symbolTable = symbolTable.getParent();
     }
 
     @Override
@@ -77,10 +78,17 @@ public class CodeGenerator extends Walker {
     @Override
     protected void exitMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
         ValueOrRegister valueOrRegister = exprRegisters.pop();
+        String methodName = current.getContext().ID().getText();
+        Method method = thisClass.getMethods()
+                .stream()
+                .filter(m -> m.getName().equals(methodName))
+                .findFirst()
+                .get();
         String type = getValOrRegType(valueOrRegister);
-        symbolTable = symbolTable.getParent();
-        ir.returnStatment(valueOrRegister.toString(), type);
+        String returnReg = ir.cast(nextRegister(), valueOrRegister.toString(), method.getReturnType(), type);
+        ir.returnStatment(returnReg, method.getReturnType());
         ir.endMethod();
+        symbolTable = symbolTable.getParent();
     }
 
     @Override
@@ -141,7 +149,13 @@ public class CodeGenerator extends Walker {
     protected void exitAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
         String var = current.getContext().ID().getText();
         String type = symbolTable.lookUpVar(var);
-        ir.store("%" + var, type, exprRegisters.pop().toString());
+        if (symbolTable.isClassVar(var)) {
+            int index = thisClass.getFieldIndex(var);
+            String tmpReg = ir.load(nextRegister(), thisClass.getName(), "%this");
+            ir.setClassElement(nextRegister(), exprRegisters.pop().toString(), type, thisClass.getName(), tmpReg, index);
+        } else {
+            ir.store("%" + var, type, exprRegisters.pop().toString());
+        }
     }
 
     @Override
@@ -512,15 +526,18 @@ public class CodeGenerator extends Walker {
                 // Get reciever
                 ValueOrRegister receiverReg = exprRegisters.pop();
                 type = symbolTable.lookUpVar(receiverReg.toString());
-                methodCall.addArg(receiverReg.toString(), type);
-                methodCall.setReceiver(getClass(type));
-                List<Method> methods = methodCall.getReceiver().getMethods();
+                Class receiverType = getClass(type);
+                List<Method> methods = receiverType.getMethods();
                 for (Method m : methods) {
                     if (m.getName().equals(current.getContext().ID().getText())) {
                         methodCall.setMethod(m);
                         break;
                     }
                 }
+                Class castToType = receiverType.getMethodParent(methodCall.getMethod());
+                String tempReg = ir.cast(nextRegister(), receiverReg.toString(), castToType.getName(), receiverType.getName());
+                methodCall.addArg(tempReg, castToType.getName());
+                methodCall.setReceiver(castToType);
                 break;
             default:
                 // Get param
@@ -574,8 +591,16 @@ public class CodeGenerator extends Walker {
     protected void enterId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String id = current.getContext().ID().getText();
         String type = symbolTable.lookUpVar(id);
-        String dstReg = nextRegister();
-        exprRegisters.push(new ValueOrRegister(ir.load(dstReg, type, "%" + id)));
+        String dstReg;
+        if (symbolTable.isClassVar(id)) {
+            String tmpReg = nextRegister();
+            ir.load(tmpReg, thisClass.getName(), "%this");
+            int index = thisClass.getFieldIndex(id);
+            dstReg = ir.getClassElement(nextRegister(), nextRegister(), type, thisClass.getName(), tmpReg, index);
+        } else {
+            dstReg = ir.load(nextRegister(), type, "%" + id);
+        }
+        exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, type);
     }
 
@@ -755,7 +780,7 @@ public class CodeGenerator extends Walker {
         Map<String, String> mangledParams = params.entrySet()
                 .stream()
                 .map(e -> new Pair<>("$" + e.getKey(), e.getValue()))
-                .collect(Collectors.toMap(e -> e.a, e -> e.b));
+                .collect(Collectors.toMap(e -> e.a, e -> e.b, (a, b) -> b, LinkedHashMap::new));
 
         // Reset labels and registers
         labelCount = 0;
@@ -778,6 +803,7 @@ public class CodeGenerator extends Walker {
     protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
         String clazzName = current.getContext().ID(0).getText();
         thisClass = getClass(clazzName);
+        symbolTable = new ClassSymbolTable(symbolTable, thisClass);
     }
 
     @Override

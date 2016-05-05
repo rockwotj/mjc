@@ -31,8 +31,8 @@ public class CompilerTest {
     public static Collection<File[]> testCases() {
         List<File[]> fileCollection = new ArrayList<>();
         if (SIMPLE_TEST) {
-            File input = new File(INPUT_FOLDER + "testcase97-03" + INPUT_EXT);
-            File output = new File(OUTPUT_FOLDER + "testcase97-03" + OUTPUT_EXT);
+            File input = new File(INPUT_FOLDER + "testcase00_14" + INPUT_EXT);
+            File output = new File(OUTPUT_FOLDER + "testcase00_14" + OUTPUT_EXT);
             fileCollection.add(new File[]{input, output});
             return fileCollection;
         }
