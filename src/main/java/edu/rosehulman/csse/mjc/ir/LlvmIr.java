@@ -1,6 +1,7 @@
 package edu.rosehulman.csse.mjc.ir;
 
 import edu.rosehulman.csse.mjc.reflect.Class;
+import edu.rosehulman.csse.mjc.reflect.Method;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class LlvmIr {
+
 
     private StringBuilder outputIR = new StringBuilder();
 
@@ -19,8 +21,65 @@ public class LlvmIr {
             List<String> fieldTypes = new ArrayList<>();
             fieldTypes.addAll(clazz.getFields().values());
             clazz(clazz.getName(), fieldTypes);
+            virtualTable(clazz, clazz.getMethods());
         }
+        for (Class clazz : classList) {
+            createVirtualTable(clazz, clazz.getMethods());
+        }
+    }
 
+    private void createVirtualTable(Class clazz, List<Method> methods) {
+        String className = clazz.getName();
+        addIR("@%sVTable = global %%vtable.%s { ", className, className);
+        int i = 0;
+        for (Method m : methods) {
+            String methodParentName = clazz.getMethodParent(m).getName();
+            addIR("%s (%s", getIRType(m.getReturnType()), getIRType(methodParentName));
+            if (m.getParams().size() > 0) {
+               addIR(", ");
+            }
+            int j = 0;
+            for (String paramType : m.getParams().values()) {
+                addIR("%s", getIRType(paramType));
+                j++;
+                if (j != m.getParams().size()) {
+                    addIR(", ");
+                }
+            }
+            addIR(") * @%s_%s", methodParentName, m.getName());
+            i++;
+            if (i != methods.size()) {
+                addIR(", ");
+            }
+        }
+        addIRLine("}");
+    }
+
+    private void virtualTable(Class clazz, List<Method> methods) {
+        String className = clazz.getName();
+        addIR("%%vtable.%s = type { ", className);
+        int i = 0;
+        for (Method m : methods) {
+            String methodParentName = clazz.getMethodParent(m).getName();
+            addIR("%s (%s", getIRType(m.getReturnType()), getIRType(methodParentName));
+            if (m.getParams().size() > 0) {
+                addIR(", ");
+            }
+            int j = 0;
+            for (String paramType : m.getParams().values()) {
+                addIR("%s", getIRType(paramType));
+                j++;
+                if (j != m.getParams().size()) {
+                    addIR(", ");
+                }
+            }
+            addIR(") *");
+            i++;
+            if (i != methods.size()) {
+                addIR(", ");
+            }
+        }
+        addIRLine("}");
     }
 
     public void startMethod(String name, Map<String, String> params, String returnType, String nextLabel) {
@@ -155,24 +214,29 @@ public class LlvmIr {
     }
 
     public void label(String labelName) {
-       addIRLine("%s:", labelName);
+        addIRLine("%s:", labelName);
     }
 
     public void branch(String srcReg, String label1, String label2) {
         addIRLine("br i1 %s, label %%%s, label %%%s", srcReg, label1, label2);
     }
+
     public void jump(String label1) {
         addIRLine("br label %%%s", label1);
     }
 
     public String phi(String dstReg, String srcRegOrVal1, String srcRegOrVal2,
-                    String label1, String label2) {
+                      String label1, String label2) {
         addIRLine("%s = phi i1 [%s, %%%s], [%s, %%%s]", dstReg, srcRegOrVal1, label1, srcRegOrVal2, label2);
         return dstReg;
     }
 
     public String clazz(String className, List<String> types) {
         addIR("%%class.%s = type { ", className);
+        addIR("%%vtable.%s*", className);
+        if (types.size() != 0) {
+            addIR(", ");
+        }
         for (int i = 0; i < types.size(); i++) {
             String type = types.get(i);
             addIR("%s", getIRType(type));
@@ -184,7 +248,7 @@ public class LlvmIr {
         return getIRType(className);
     }
 
-    public String newConstruct(String tmpReg, String dstReg, Class clazz) {
+    public String newConstruct(String tmpReg1, String dstReg, String tmpReg2, Class clazz) {
         int numElements = clazz.getFields().size();
         int maxSize = 0;
         for (Map.Entry<String, String> entry : clazz.getFields().entrySet()) {
@@ -194,8 +258,10 @@ public class LlvmIr {
                 maxSize = irSize;
             }
         }
-        addIRLine("%s = call noalias i8* @calloc(i64 1, i64 %d)", tmpReg, maxSize * numElements);
-        addIRLine("%s = bitcast i8* %s to %s", dstReg, tmpReg, getIRType(clazz.getName()));
+        addIRLine("%s = call noalias i8* @calloc(i64 1, i64 %d)", tmpReg1, maxSize * numElements);
+        addIRLine("%s = bitcast i8* %s to %s", dstReg, tmpReg1, getIRType(clazz.getName()));
+        addIRLine("%s = getelementptr inbounds %%class.%s, %%class.%s* %s, i32 0, i32 0", tmpReg2, clazz.getName(), clazz.getName(), dstReg);
+        addIRLine("store %%vtable.%s* @%sVTable, %%vtable.%s** %s, align 8", clazz.getName(), clazz.getName(), clazz.getName(), tmpReg2);
         return dstReg;
     }
 
@@ -206,7 +272,7 @@ public class LlvmIr {
             addIR("%s %s", getIRType(arg.b), arg.a);
             i++;
             if (i != args.size()) {
-               addIR(", ");
+                addIR(", ");
             }
         }
         addIRLine(")");
@@ -224,6 +290,7 @@ public class LlvmIr {
     private void addIRLine(String ir, Object... args) {
         outputIR.append(String.format(ir, args)).append("\n");
     }
+
     private void addIR(String ir, Object... args) {
         outputIR.append(String.format(ir, args));
     }

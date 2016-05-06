@@ -582,7 +582,7 @@ public class CodeGenerator extends Walker {
     protected void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String className = current.getContext().ID().getText();
         Class clazz = getClass(className);
-        String dstReg = ir.newConstruct(nextRegister(), nextRegister(), clazz);
+        String dstReg = ir.newConstruct(nextRegister(), nextRegister(), nextRegister(), clazz);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, className);
     }

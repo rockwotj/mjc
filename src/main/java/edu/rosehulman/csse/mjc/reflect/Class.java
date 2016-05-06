@@ -24,7 +24,8 @@ public class Class {
     }
 
     public int getFieldIndex(String name) {
-        int index = 0;
+        // Account for VTable
+        int index = 1;
         for (Map.Entry<String, String> entry : fields.entrySet()) {
             if (entry.getKey().equals(name)) {
                 return index;
@@ -32,6 +33,10 @@ public class Class {
             index++;
         }
         throw new RuntimeException("Name " + name + " not in class " + this.name);
+    }
+
+    public int getMethodIndex(Method m) {
+        return getMethods().indexOf(m);
     }
 
     public void addFields(String name, String type) {
