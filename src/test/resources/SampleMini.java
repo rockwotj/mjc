@@ -1,7 +1,13 @@
 class Main {
     public static void main(String[] args) {
-        Bar f = new Bar();
-        System.out.println(f.print(f));
+        Foo f = new Bar();
+        Foo a = new Foo();
+        int b = 5;
+        if (f != a) {
+            System.out.println(f.print(f));
+        } else {
+            System.out.println(100);
+        }
     }
 }
 

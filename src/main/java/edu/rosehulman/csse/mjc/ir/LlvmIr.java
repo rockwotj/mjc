@@ -96,6 +96,8 @@ public class LlvmIr {
             return "i32";
         } else if (returnType.equals("boolean")) {
             return "i1";
+        } else if (returnType.equals("null")) {
+            return "i8*";
         } else {
             return "%class." + returnType + "*";
         }

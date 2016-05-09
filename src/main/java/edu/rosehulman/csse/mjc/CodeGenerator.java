@@ -197,22 +197,36 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        // TODO: Handle objects
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
-        String type = getValOrRegType(valueOrRegister1);
-        String dstReg = ir.equals(nextRegister(), type, valueOrRegister1.toString(), valueOrRegister2.toString());
+        String valOrReg1 = valueOrRegister1.toString();
+        String valOrReg2 = valueOrRegister2.toString();
+        String type1 = getValOrRegType(valueOrRegister1);
+        String type2 = getValOrRegType(valueOrRegister2);
+        if (!isPrimative(type1)) {
+            valOrReg1 = ir.cast(nextRegister(), valOrReg1, "null", type1);
+            valOrReg2 = ir.cast(nextRegister(), valOrReg2, "null", type2);
+            type1 = "null";
+        }
+        String dstReg = ir.equals(nextRegister(), type1, valOrReg1, valOrReg2);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, "boolean");
     }
 
     @Override
     protected void exitNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-        // TODO: Handle objects
         ValueOrRegister valueOrRegister2 = exprRegisters.pop();
         ValueOrRegister valueOrRegister1 = exprRegisters.pop();
-        String type = getValOrRegType(valueOrRegister1);
-        String dstReg = ir.notEquals(nextRegister(), type, valueOrRegister1.toString(), valueOrRegister2.toString());
+        String valOrReg1 = valueOrRegister1.toString();
+        String valOrReg2 = valueOrRegister2.toString();
+        String type1 = getValOrRegType(valueOrRegister1);
+        String type2 = getValOrRegType(valueOrRegister2);
+        if (!isPrimative(type1)) {
+            valOrReg1 = ir.cast(nextRegister(), valOrReg1, "null", type1);
+            valOrReg2 = ir.cast(nextRegister(), valOrReg2, "null", type2);
+            type1 = "null";
+        }
+        String dstReg = ir.notEquals(nextRegister(), type1, valOrReg1, valOrReg2);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, "boolean");
     }
@@ -844,6 +858,11 @@ public class CodeGenerator extends Walker {
             }
         }
         return result;
+    }
+
+
+    private boolean isPrimative(String name) {
+        return name.equals("int") || name.equals("boolean");
     }
 
     @Override

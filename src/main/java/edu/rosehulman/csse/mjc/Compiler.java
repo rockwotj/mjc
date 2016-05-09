@@ -19,8 +19,7 @@ public class Compiler {
     @Parameter(names = {"--output", "-o"})
     String output = "./build/out.ll";
     @Parameter(names = {"--input", "-i"})
-    String input = "./src/test/resources/FinalFullTests/testcase97-02.java";
-//    String input = "./src/test/resources/SampleMini.java";
+    String input = "./src/test/resources/SampleMini.java";
     @Parameter(names = {"--help", "-h"}, help = true)
     boolean help;
 
