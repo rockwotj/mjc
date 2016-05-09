@@ -2,6 +2,7 @@ package edu.rosehulman.csse.mjc.reflect;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -48,11 +49,22 @@ public class Class {
 
     public List<Method> getMethods() {
         ArrayList<Method> list = new ArrayList<>();
-        list.addAll(methods);
+        List<Method> overriddenMethods = new ArrayList<>();
         List<Method> inhiertedMethods = parentMethods.stream()
-                .filter(m -> methods.stream().noneMatch(method -> Objects.equals(method.getName(), m.getName())))
+                .map(superMethod -> {
+                    for (Method method : methods) {
+                       if (superMethod.equals(method)) {
+                           overriddenMethods.add(method);
+                           return method;
+                       }
+                    }
+                    return superMethod;
+                })
                 .collect(toList());
         list.addAll(inhiertedMethods);
+        list.addAll(methods.stream()
+                .filter(method -> !overriddenMethods.contains(method))
+                .collect(Collectors.toList()));
         return list;
     }
 

@@ -33,20 +33,9 @@ public class LlvmIr {
         addIR("@%sVTable = global %%vtable.%s { ", className, className);
         int i = 0;
         for (Method m : methods) {
+            addIR("%s", generateMethodSignature(clazz, m));
             String methodParentName = clazz.getMethodParent(m).getName();
-            addIR("%s (%s", getIRType(m.getReturnType()), getIRType(methodParentName));
-            if (m.getParams().size() > 0) {
-               addIR(", ");
-            }
-            int j = 0;
-            for (String paramType : m.getParams().values()) {
-                addIR("%s", getIRType(paramType));
-                j++;
-                if (j != m.getParams().size()) {
-                    addIR(", ");
-                }
-            }
-            addIR(") * @%s_%s", methodParentName, m.getName());
+            addIR(" @%s_%s", methodParentName, m.getName());
             i++;
             if (i != methods.size()) {
                 addIR(", ");
@@ -60,26 +49,32 @@ public class LlvmIr {
         addIR("%%vtable.%s = type { ", className);
         int i = 0;
         for (Method m : methods) {
-            String methodParentName = clazz.getMethodParent(m).getName();
-            addIR("%s (%s", getIRType(m.getReturnType()), getIRType(methodParentName));
-            if (m.getParams().size() > 0) {
-                addIR(", ");
-            }
-            int j = 0;
-            for (String paramType : m.getParams().values()) {
-                addIR("%s", getIRType(paramType));
-                j++;
-                if (j != m.getParams().size()) {
-                    addIR(", ");
-                }
-            }
-            addIR(") *");
+            addIR("%s", generateMethodSignature(clazz, m));
             i++;
             if (i != methods.size()) {
                 addIR(", ");
             }
         }
         addIRLine("}");
+    }
+
+    private String generateMethodSignature(Class clazz, Method m) {
+        String methodParentName = clazz.getMethodParent(m).getName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("%s (%s", getIRType(m.getReturnType()), getIRType(methodParentName)));
+        if (m.getParams().size() > 0) {
+            sb.append(", ");
+        }
+        int j = 0;
+        for (String paramType : m.getParams().values()) {
+            sb.append(getIRType(paramType));
+            j++;
+            if (j != m.getParams().size()) {
+                sb.append(", ");
+            }
+        }
+        sb.append(") *");
+        return sb.toString();
     }
 
     public void startMethod(String name, Map<String, String> params, String returnType, String nextLabel) {
@@ -249,15 +244,8 @@ public class LlvmIr {
     }
 
     public String newConstruct(String tmpReg1, String dstReg, String tmpReg2, Class clazz) {
-        int numElements = clazz.getFields().size();
-        int maxSize = 0;
-        for (Map.Entry<String, String> entry : clazz.getFields().entrySet()) {
-            String irType = getIRType(entry.getValue());
-            int irSize = getIRTypeSizeInBytes(irType);
-            if (maxSize < irSize) {
-                maxSize = irSize;
-            }
-        }
+        int numElements = clazz.getFields().size() + 1;
+        int maxSize = 8; // Always the pointer for the VTable
         addIRLine("%s = call noalias i8* @calloc(i64 1, i64 %d)", tmpReg1, maxSize * numElements);
         addIRLine("%s = bitcast i8* %s to %s", dstReg, tmpReg1, getIRType(clazz.getName()));
         addIRLine("%s = getelementptr inbounds %%class.%s, %%class.%s* %s, i32 0, i32 0", tmpReg2, clazz.getName(), clazz.getName(), dstReg);
@@ -265,13 +253,27 @@ public class LlvmIr {
         return dstReg;
     }
 
-    public String methodCall(String dstReg, String methodName, String returnType, List<Pair<String, String>> args) {
-        addIR("%s = call %s @%s(", dstReg, getIRType(returnType), methodName);
+    public String methodCall(String tmpReg1, String tmpReg2, String tmpReg3, String tmpReg4, String dstReg, MethodCall methodCall) {
+        String recieverReg = methodCall.getArguments().get(0).a;
+        String className = methodCall.getReceiver().getName();
+        String classType = getIRType(className);
+        addIRLine("%s = getelementptr inbounds %%class.%s, %s %s, i32 0, i32 0", tmpReg1, className, classType, recieverReg);
+        addIRLine("%s = load %%vtable.%s*, %%vtable.%s** %s, align 8", tmpReg2, className, className, tmpReg1);
+        int methodOffset = methodCall.getReceiver().getMethodIndex(methodCall.getMethod());
+        addIRLine("%s = getelementptr inbounds %%vtable.%s, %%vtable.%s* %s, i32 0, i32 %d", tmpReg3, className, className, tmpReg2, methodOffset);
+        String methodSignature = generateMethodSignature(methodCall.getReceiver(), methodCall.getMethod());
+        addIRLine("%s = load %s, %s* %s, align 8", tmpReg4, methodSignature, methodSignature, tmpReg3);
+        String returnType = getIRType(methodCall.getMethod().getReturnType());
+        addIR("%s = call %s %s(", dstReg, returnType, tmpReg4);
         int i = 0;
-        for (Pair<String, String> arg : args) {
-            addIR("%s %s", getIRType(arg.b), arg.a);
+        List<String> paramTypes = new ArrayList<>();
+        paramTypes.add(className);
+        paramTypes.addAll(methodCall.getMethod().getParamTypes());
+        for (Pair<String, String> arg : methodCall.getArguments()) {
+            String type = paramTypes.get(i);
+            addIR("%s %s", getIRType(type), arg.a);
             i++;
-            if (i != args.size()) {
+            if (i != methodCall.getArguments().size()) {
                 addIR(", ");
             }
         }

@@ -246,7 +246,8 @@ public class TypeChecker extends BaseWalker {
         for (int i = 0; i < numParams; i++) {
             String s = paramList.get(i);
             String s1 = method.getParamTypes().get(i);
-            if (!s.equals(s1)) {
+            if (!isAssignable(s1, s)) {
+                System.err.println(current.getContext().getText());
                 throw new RuntimeException(methodName + " has invalid type for parameter number " + i);
             }
         }

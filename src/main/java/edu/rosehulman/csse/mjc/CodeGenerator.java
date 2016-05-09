@@ -110,8 +110,11 @@ public class CodeGenerator extends Walker {
     protected void exitVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
         String id = current.getContext().ID().getText();
         String type = current.getContext().type().getText();
+        ValueOrRegister valueOrRegister = exprRegisters.pop();
+        String valOrRegType = getValOrRegType(valueOrRegister);
+        String castReg = ir.cast(nextRegister(), valueOrRegister.toString(), type, valOrRegType);
         ir.allocateStack("%" + id, type);
-        ir.store("%" + id, type, exprRegisters.pop().toString());
+        ir.store("%" + id, type, castReg);
         symbolTable.addVar(id, type);
     }
 
@@ -149,12 +152,15 @@ public class CodeGenerator extends Walker {
     protected void exitAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
         String var = current.getContext().ID().getText();
         String type = symbolTable.lookUpVar(var);
+        ValueOrRegister valueOrRegister = exprRegisters.pop();
+        String valOrRegType = getValOrRegType(valueOrRegister);
+        String castReg = ir.cast(nextRegister(), valueOrRegister.toString(), type, valOrRegType);
         if (symbolTable.isClassVar(var)) {
             int index = thisClass.getFieldIndex(var);
             String tmpReg = ir.load(nextRegister(), thisClass.getName(), "%this");
-            ir.setClassElement(nextRegister(), exprRegisters.pop().toString(), type, thisClass.getName(), tmpReg, index);
+            ir.setClassElement(nextRegister(), castReg, type, thisClass.getName(), tmpReg, index);
         } else {
-            ir.store("%" + var, type, exprRegisters.pop().toString());
+            ir.store("%" + var, type, castReg);
         }
     }
 
@@ -303,7 +309,7 @@ public class CodeGenerator extends Walker {
     protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
         betweenMethodCall(current, current.getChildren().size() - 1);
         MethodCall methodCall = methodArgs.pop();
-        String dstReg = ir.methodCall(nextRegister(), methodCall.getName(), methodCall.getMethod().getReturnType(), methodCall.getArguments());
+        String dstReg = ir.methodCall(nextRegister(), nextRegister(), nextRegister(), nextRegister(), nextRegister(), methodCall);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, methodCall.getMethod().getReturnType());
     }
@@ -520,7 +526,7 @@ public class CodeGenerator extends Walker {
     @Override
     protected void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count) {
         MethodCall methodCall = methodArgs.peek();
-        String type;
+        String type, tempReg;
         switch (count) {
             case 0:
                 // Get reciever
@@ -535,7 +541,7 @@ public class CodeGenerator extends Walker {
                     }
                 }
                 Class castToType = receiverType.getMethodParent(methodCall.getMethod());
-                String tempReg = ir.cast(nextRegister(), receiverReg.toString(), castToType.getName(), receiverType.getName());
+                tempReg = ir.cast(nextRegister(), receiverReg.toString(), castToType.getName(), receiverType.getName());
                 methodCall.addArg(tempReg, castToType.getName());
                 methodCall.setReceiver(castToType);
                 break;
@@ -543,7 +549,17 @@ public class CodeGenerator extends Walker {
                 // Get param
                 ValueOrRegister arg = exprRegisters.pop();
                 type = getValOrRegType(arg);
-                methodCall.addArg(arg.toString(), type);
+                String castTo = null;
+                int index = 1;
+                for (Map.Entry<String, String> entry : methodCall.getMethod().getParams().entrySet()) {
+                   if (index == count) {
+                       castTo = entry.getValue();
+                       break;
+                   }
+                    index++;
+                }
+                tempReg = ir.cast(nextRegister(), arg.toString(), castTo, type);
+                methodCall.addArg(tempReg, type);
                 break;
         }
     }
