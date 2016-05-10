@@ -50,6 +50,8 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
         nil,
         self,
         id,
+        puts,
+        character,
         constructor
     }
 

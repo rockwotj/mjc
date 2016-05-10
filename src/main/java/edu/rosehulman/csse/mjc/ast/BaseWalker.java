@@ -9,6 +9,36 @@ public abstract class BaseWalker extends Walker {
     }
 
     @Override
+    protected void exitPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current) {
+
+    }
+
+    @Override
+    protected void exitCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
+    protected void betweenPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current, int count) {
+
+    }
+
+    @Override
+    protected void betweenCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void enterPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current) {
+
+    }
+
+    @Override
+    protected void enterCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
     protected void exitProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current) {
 
     }

@@ -4,10 +4,16 @@ package edu.rosehulman.csse.mjc.ir;
 public class ValueOrRegister {
 
     private Integer value;
+    private Character character;
     private Boolean bool;
     private String register;
 
-    public ValueOrRegister() {}
+    public ValueOrRegister() {
+    }
+
+    public ValueOrRegister(char value) {
+        this.character = value;
+    }
 
     public ValueOrRegister(int value) {
         this.value = value;
@@ -34,17 +40,20 @@ public class ValueOrRegister {
         return !isRegister();
     }
 
-
     public String getValue() {
-        return "" + (value == null ? bool == null ? "null" : bool : value);
+        return "" + (value == null ? bool == null ? character == null ? "null" : ((int)character) : bool : value);
     }
 
-    public boolean isInt() { return value != null; }
+    public boolean isInt() {
+        return value != null;
+    }
 
-    public boolean isBool() { return bool != null; }
+    public boolean isBool() {
+        return bool != null;
+    }
 
     public boolean isNull() {
-        return value == null && bool == null && register == null;
+        return value == null && bool == null && register == null && character == null;
     }
 
     public String getType() {
@@ -55,9 +64,15 @@ public class ValueOrRegister {
                 return "int";
             } else if (this.isBool()) {
                 return "boolean";
+            } else if (this.isCharacter()) {
+                return "char";
             } else {
                 return "null";
             }
         }
+    }
+
+    private boolean isCharacter() {
+        return character != null;
     }
 }

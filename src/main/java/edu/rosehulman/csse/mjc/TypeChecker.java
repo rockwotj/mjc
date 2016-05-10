@@ -90,10 +90,18 @@ public class TypeChecker extends BaseWalker {
         }
     }
 
+    @Override
+    protected void exitPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current) {
+        String printType = typeStack.pop();
+        if (!printType.equals("char")) {
+            throw new RuntimeException("You can only print chars!");
+        }
+    }
+
     protected void exitPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
         String printType = typeStack.pop();
         if (!printType.equals("int")) {
-            throw new RuntimeException("You can only print integers!");
+            throw new RuntimeException("You can only println integers!");
         }
     }
 
@@ -258,6 +266,11 @@ public class TypeChecker extends BaseWalker {
         typeStack.push("int");
     }
 
+    @Override
+    protected void exitCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        typeStack.push("char");
+    }
+
     protected void exitBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         typeStack.push("boolean");
     }
@@ -349,7 +362,7 @@ public class TypeChecker extends BaseWalker {
     }
 
     private boolean isPrimative(String name) {
-        return name.equals("int") || name.equals("boolean");
+        return name.equals("int") || name.equals("boolean") || name.equals("char");
     }
 
     private boolean isAssignable(String containerType, String instanceType) {
@@ -376,6 +389,7 @@ public class TypeChecker extends BaseWalker {
     private boolean isValidType(String name) {
         return name.equals("int") ||
                 name.equals("boolean") ||
+                name.equals("char") ||
                 name.equals("null") ||
                 classes.stream().anyMatch(aClass -> aClass.getName().equals(name));
     }

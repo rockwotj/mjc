@@ -133,6 +133,12 @@ public abstract class Walker {
             case constructor:
                 enterConstructor(current);
                 break;
+            case character:
+                enterCharacter(current);
+                break;
+            case puts:
+                enterPuts(current);
+                break;
         }
         parents.push(current);
         List<AbstractSyntaxNode> children = current.getChildren();
@@ -251,6 +257,12 @@ public abstract class Walker {
                 case constructor:
                     betweenConstructor(current, count);
                     break;
+                case character:
+                    betweenCharacter(current, count);
+                    break;
+                case puts:
+                    betweenPuts(current, count);
+                    break;
             }
             count++;
         }
@@ -364,10 +376,27 @@ public abstract class Walker {
             case constructor:
                 exitConstructor(current);
                 break;
+            case character:
+                exitCharacter(current);
+                break;
+            case puts:
+                exitPuts(current);
+                break;
         }
     }
 
-   
+    protected abstract void exitPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current);
+
+    protected abstract void exitCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
+    protected abstract void betweenPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current, int count);
+
+    protected abstract void betweenCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void enterPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current);
+
+    protected abstract void enterCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
     protected abstract void exitProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current);
 
     protected abstract void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current);
@@ -512,7 +541,6 @@ public abstract class Walker {
     protected abstract void betweenId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
 
     protected abstract void betweenConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
-
 
     protected abstract void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
 

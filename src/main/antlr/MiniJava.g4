@@ -6,17 +6,19 @@ classDecl : 'class' ID ('extends' ID)? '{' (classVarDecl)* (methodDecl)* '}' ;
 classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID (LPAREN (formal (',' formal)*)? RPAREN | PAREN) '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
-type : INT_TYPE | BOOL_TYPE | ID ;
+type : INT_TYPE | BOOL_TYPE | CHAR_TYPE | ID ;
 stmt : varDecl
  | block
  | ifElse
  | whileDecl
+ | puts
  | print
  | assigment ;
 varDecl : type ID  '=' expr ';' ;
 block : '{' (stmt)* '}' ;
 ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
 whileDecl : 'while' '(' expr ')' stmt ;
+puts : 'System.out.print' '(' expr ')' ';' ;
 print : 'System.out.println' '(' expr ')' ';' ;
 assigment : ID  '=' expr ';' ;
 
@@ -57,6 +59,7 @@ methodCall :
 atom :
       INT
     | BOOL
+    | CHAR
     | NULL
     | THIS
     | NEW ID (PAREN | LPAREN RPAREN)
@@ -70,11 +73,13 @@ THIS : 'this' ;
 NEW  : 'new' ;
 BOOL_TYPE : 'boolean';
 INT_TYPE : 'int';
+CHAR_TYPE : 'char';
 
 // Types
 INT   : NONZERODIGIT DIGIT* | '0' ;
 DIGIT : [0-9] ;
 NONZERODIGIT : [1-9] ;
+CHAR : '\'' (LETTER | DIGIT | '\\n' | '\\t' | ' ' | '.' | '!' | '?' | ';' | ':' | '$') '\'';
 BOOL  : TRUE | FALSE ;
 FALSE : 'false' ;
 TRUE  : 'true' ;

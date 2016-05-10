@@ -4,10 +4,10 @@ package edu.rosehulman.csse.mjc;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
-import edu.rosehulman.csse.mjc.reflect.Class;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import edu.rosehulman.csse.mjc.reflect.Class;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -51,7 +51,7 @@ public class Compiler {
         walker.walk(astBuilder, parseTreeRoot);
         AbstractSyntaxNode ast = astBuilder.getAbstractSyntaxTree();
 //        System.out.println(ast.toString());
-
+//
         // Build class info
         ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);
         chb.walk();

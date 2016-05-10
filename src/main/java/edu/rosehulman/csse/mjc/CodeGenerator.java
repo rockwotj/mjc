@@ -1,7 +1,7 @@
 package edu.rosehulman.csse.mjc;
 
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
-import edu.rosehulman.csse.mjc.ast.Walker;
+import edu.rosehulman.csse.mjc.ast.BaseWalker;
 import edu.rosehulman.csse.mjc.ir.*;
 import edu.rosehulman.csse.mjc.reflect.Class;
 import edu.rosehulman.csse.mjc.reflect.ClassSymbolTable;
@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.misc.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CodeGenerator extends Walker {
+public class CodeGenerator extends BaseWalker {
 
     private final List<Class> classList;
     private LlvmIr ir;
@@ -54,11 +54,6 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
-    protected void exitProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current) {
-
-    }
-
-    @Override
     protected void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
         symbolTable = symbolTable.getParent();
         symbolTable.clearPreviouslyDeclaredVars();
@@ -70,11 +65,6 @@ public class CodeGenerator extends Walker {
     protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
         symbolTable = symbolTable.getParent();
         symbolTable.clearPreviouslyDeclaredVars();
-    }
-
-    @Override
-    protected void exitClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
-
     }
 
     @Override
@@ -92,21 +82,6 @@ public class CodeGenerator extends Walker {
         ir.endMethod();
         symbolTable = symbolTable.getParent();
         symbolTable.clearPreviouslyDeclaredVars();
-    }
-
-    @Override
-    protected void exitFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
-
-    }
-
-    @Override
-    protected void exitType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current) {
-
-    }
-
-    @Override
-    protected void exitStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current) {
-
     }
 
     @Override
@@ -146,6 +121,12 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
+    protected void exitPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current) {
+        ValueOrRegister valueOrRegister = exprRegisters.pop();
+        ir.puts(nextRegister(), nextRegister(), valueOrRegister.toString());
+    }
+
+    @Override
     protected void exitPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
         ValueOrRegister valueOrRegister = exprRegisters.pop();
         ir.print(nextRegister(), valueOrRegister.toString());
@@ -165,11 +146,6 @@ public class CodeGenerator extends Walker {
         } else {
             ir.store("%" + var, type, castReg);
         }
-    }
-
-    @Override
-    protected void exitExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current) {
-
     }
 
     @Override
@@ -331,84 +307,6 @@ public class CodeGenerator extends Walker {
         symbolTable.addVar(dstReg, methodCall.getMethod().getReturnType());
     }
 
-    @Override
-    protected void exitInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
-    }
-
-    @Override
-    protected void exitBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
-    }
-
-    @Override
-    protected void exitNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
-    }
-
-    @Override
-    protected void exitThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
-    }
-
-    @Override
-    protected void exitId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
-    }
-
-    @Override
-    protected void exitConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-
-    }
-
-    @Override
-    protected void betweenProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current, int count) {
-    }
-
-    @Override
-    protected void betweenFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current, int count) {
-
-    }
 
     @Override
     protected void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count) {
@@ -481,66 +379,6 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
-    protected void betweenEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current, int count) {
-
-    }
-
-    @Override
     protected void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count) {
         MethodCall methodCall = methodArgs.peek();
         String type, tempReg;
@@ -579,36 +417,6 @@ public class CodeGenerator extends Walker {
                 methodCall.addArg(tempReg, type);
                 break;
         }
-    }
-
-    @Override
-    protected void betweenInt(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenBool(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenNull(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenThis(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
-
     }
 
     @Override
@@ -665,95 +473,26 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
+    protected void enterCharacter(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String aChar = current.getContext().CHAR().getText();
+        char value;
+        switch (aChar) {
+            case "'\\n'":
+                value = '\n';
+                break;
+            case "'\\t'":
+                value = '\t';
+                break;
+            default:
+                value = aChar.charAt(1);
+        }
+        exprRegisters.push(new ValueOrRegister(value));
+    }
+
+    @Override
     protected void enterMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
         methodArgs.push(new MethodCall());
     }
-
-    @Override
-    protected void enterNeg(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
-
-    }
-
-    @Override
-    protected void enterBang(AbstractSyntaxNode<MiniJavaParser.UnaryContext> current) {
-
-    }
-
-    @Override
-    protected void enterDiv(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-
-    }
-
-    @Override
-    protected void enterMult(AbstractSyntaxNode<MiniJavaParser.MultOrDivContext> current) {
-
-    }
-
-    @Override
-    protected void enterMinus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-
-    }
-
-    @Override
-    protected void enterPlus(AbstractSyntaxNode<MiniJavaParser.PlusOrMinusContext> current) {
-
-    }
-
-    @Override
-    protected void enterGreaterThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
-    }
-
-    @Override
-    protected void enterLessThanEquals(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
-    }
-
-    @Override
-    protected void enterGreaterThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
-    }
-
-    @Override
-    protected void enterLessThan(AbstractSyntaxNode<MiniJavaParser.RelationContext> current) {
-
-    }
-
-    @Override
-    protected void enterNotEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-
-    }
-
-    @Override
-    protected void enterEquals(AbstractSyntaxNode<MiniJavaParser.EqualsOrNotEqualsContext> current) {
-
-    }
-
-    @Override
-    protected void enterLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current) {
-
-    }
-
-    @Override
-    protected void enterLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current) {
-
-    }
-
-    @Override
-    protected void enterExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current) {
-
-    }
-
-    @Override
-    protected void enterAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
-
-    }
-
-    @Override
-    protected void enterPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current) {
-
-    }
-
     @Override
     protected void enterWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
         String testLabel = getNextLabel();
@@ -766,32 +505,8 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
-    protected void enterIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current) {
-
-    }
-
-    @Override
     protected void enterBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
         symbolTable = new SymbolTable(symbolTable);
-    }
-
-    @Override
-    protected void enterVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
-    }
-
-    @Override
-    protected void enterStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current) {
-
-    }
-
-    @Override
-    protected void enterType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current) {
-
-    }
-
-    @Override
-    protected void enterFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
-
     }
 
     @Override
@@ -829,10 +544,6 @@ public class CodeGenerator extends Walker {
     }
 
     @Override
-    protected void enterClassVarDecl(AbstractSyntaxNode<MiniJavaParser.ClassVarDeclContext> current) {
-    }
-
-    @Override
     protected void enterClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
         String clazzName = current.getContext().ID(0).getText();
         thisClass = getClass(clazzName);
@@ -845,11 +556,6 @@ public class CodeGenerator extends Walker {
         String label = getNextLabel();
         ir.startMethod("main", Collections.emptyMap(), "int", label);
         lastLabel = label;
-    }
-
-    @Override
-    protected void enterProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current) {
-
     }
 
     private Class getClass(String name) {
@@ -865,7 +571,7 @@ public class CodeGenerator extends Walker {
 
 
     private boolean isPrimative(String name) {
-        return name.equals("int") || name.equals("boolean");
+        return name.equals("int") || name.equals("boolean") || name.equals("char");
     }
 
     @Override

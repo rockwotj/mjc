@@ -14,7 +14,8 @@ public class LlvmIr {
     private StringBuilder outputIR = new StringBuilder();
 
     public LlvmIr(List<Class> classList) {
-        addIRLine("@.str = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1");
+        addIRLine("@.PrintStr = private unnamed_addr constant [4 x i8] c\"%%d\\0A\\00\", align 1");
+        addIRLine("@.PutsStr = private unnamed_addr constant [3 x i8] c\"%%c\\00\", align 1");
         addIRLine("declare i32 @printf(i8*, ...)");
         addIRLine("declare noalias i8* @calloc(i64, i64)");
         for (Class clazz : classList) {
@@ -96,6 +97,8 @@ public class LlvmIr {
             return "i32";
         } else if (returnType.equals("boolean")) {
             return "i1";
+        } else if (returnType.equals("char")) {
+            return "i8";
         } else if (returnType.equals("null")) {
             return "i8*";
         } else {
@@ -104,17 +107,25 @@ public class LlvmIr {
     }
 
     private int getIRTypeSizeInBytes(String returnType) {
-        if (returnType.equals("i32")) {
-            return 4;
-        } else if (returnType.equals("i1")) {
-            return 1;
-        } else {
-            return 8;
+        switch (returnType) {
+            case "i32":
+                return 4;
+            case "i8":
+                return 1;
+            case "i1":
+                return 1;
+            default:
+                return 8;
         }
     }
 
+    public void puts(String tmpReg, String dstReg,  String valueOrReg) {
+        addIRLine("%s = sext i8 %s to i32", tmpReg, valueOrReg);
+        addIRLine("%s = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @.PutsStr, i32 0, i32 0), i32 %s)", dstReg, tmpReg);
+    }
+
     public void print(String dstReg, String valueOrReg) {
-        addIRLine("%s = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.str, i32 0, i32 0), i32 %s)", dstReg, valueOrReg);
+        addIRLine("%s = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([4 x i8], [4 x i8]* @.PrintStr, i32 0, i32 0), i32 %s)", dstReg, valueOrReg);
     }
 
     public void allocateStack(String reg, String type) {
