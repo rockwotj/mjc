@@ -5,8 +5,14 @@ class Main {
                 int i = 3;
                 System.out.println(i);
             }
-            int i = 2;
-            System.out.println(i);
+            boolean i = true;
+            if (i) {
+                int j = 2;
+                System.out.println(j);
+            } else {
+                int j = 0;
+                System.out.println(j);
+            }
         }
         int i = 1;
         System.out.println(i);

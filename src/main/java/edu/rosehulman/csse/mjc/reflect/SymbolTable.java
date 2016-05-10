@@ -6,6 +6,7 @@ import java.util.Map;
 public class SymbolTable {
 
     protected Map<String, String> vars = new HashMap<>();
+    protected Map<String, Integer> previouslyDelcaredVars = new HashMap<>();
     private SymbolTable parent = null;
 
     public SymbolTable() {
@@ -14,6 +15,7 @@ public class SymbolTable {
 
     public SymbolTable(SymbolTable parent) {
         this.parent = parent;
+        this.previouslyDelcaredVars.putAll(parent.previouslyDelcaredVars);
     }
 
     /**
@@ -26,6 +28,7 @@ public class SymbolTable {
         } else if (parent != null) {
             return parent.lookUpVar(name);
         } else {
+
             throw new RuntimeException("Variable " + name + " does not exist within scope.");
         }
     }
@@ -46,6 +49,26 @@ public class SymbolTable {
         return vars.containsKey(name) || (parent != null && getParent().containsVar(name));
     }
 
+    public String getName(String name) {
+        Integer timesSeen = previouslyDelcaredVars.getOrDefault(name, 0);
+        if (timesSeen > 0) {
+            return name + timesSeen;
+        } else if (parent != null) {
+            return parent.getName(name);
+        } else {
+            return name;
+        }
+    }
+
+    public String declareVar(String name) {
+        int timesSeen = previouslyDelcaredVars.getOrDefault(name, 0);
+        previouslyDelcaredVars.put(name, timesSeen + 1);
+        if (parent != null) {
+            parent.declareVar(name);
+        }
+        return getName(name);
+    }
+
     public SymbolTable getParent() {
         return parent;
     }
@@ -53,5 +76,9 @@ public class SymbolTable {
     @Override
     public String toString() {
         return vars.toString() + " | " + (parent != null ? parent.toString() : "null");
+    }
+
+    public void clearPreviouslyDeclaredVars() {
+        previouslyDelcaredVars.clear();
     }
 }

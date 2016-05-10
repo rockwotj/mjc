@@ -16,9 +16,9 @@ import java.util.List;
 
 public class Compiler {
 
-    @Parameter(names = {"--output", "-o"})
+    @Parameter(names = {"--output", "-o"}, description = "The output ll file to generate")
     String output = "./build/out.ll";
-    @Parameter(names = {"--input", "-i"})
+    @Parameter(names = {"--input", "-i"}, description = "The input mini java file to process")
     String input = "./src/test/resources/SampleMini.java";
     @Parameter(names = {"--help", "-h"}, help = true)
     boolean help;

@@ -16,4 +16,12 @@ public class ClassSymbolTable extends SymbolTable {
     public boolean isClassVar(String name) {
         return vars.containsKey(name);
     }
+
+    @Override
+    public String declareVar(String name) { return name; }
+
+    @Override
+    public String getName(String name) {
+        return name;
+    }
 }

@@ -61,6 +61,7 @@ public class CodeGenerator extends Walker {
     @Override
     protected void exitMainClassDecl(AbstractSyntaxNode<MiniJavaParser.MainClassDeclContext> current) {
         symbolTable = symbolTable.getParent();
+        symbolTable.clearPreviouslyDeclaredVars();
         ir.returnStatment("0", "int");
         ir.endMethod();
     }
@@ -68,6 +69,7 @@ public class CodeGenerator extends Walker {
     @Override
     protected void exitClassDecl(AbstractSyntaxNode<MiniJavaParser.ClassDeclContext> current) {
         symbolTable = symbolTable.getParent();
+        symbolTable.clearPreviouslyDeclaredVars();
     }
 
     @Override
@@ -89,6 +91,7 @@ public class CodeGenerator extends Walker {
         ir.returnStatment(returnReg, method.getReturnType());
         ir.endMethod();
         symbolTable = symbolTable.getParent();
+        symbolTable.clearPreviouslyDeclaredVars();
     }
 
     @Override
@@ -108,7 +111,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
-        String id = current.getContext().ID().getText();
+        String id = symbolTable.declareVar(current.getContext().ID().getText());
         String type = current.getContext().type().getText();
         ValueOrRegister valueOrRegister = exprRegisters.pop();
         String valOrRegType = getValOrRegType(valueOrRegister);
@@ -150,7 +153,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void exitAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
-        String var = current.getContext().ID().getText();
+        String var = symbolTable.getName(current.getContext().ID().getText());
         String type = symbolTable.lookUpVar(var);
         ValueOrRegister valueOrRegister = exprRegisters.pop();
         String valOrRegType = getValOrRegType(valueOrRegister);
@@ -619,7 +622,7 @@ public class CodeGenerator extends Walker {
 
     @Override
     protected void enterId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
-        String id = current.getContext().ID().getText();
+        String id = symbolTable.getName(current.getContext().ID().getText());
         String type = symbolTable.lookUpVar(id);
         String dstReg;
         if (symbolTable.isClassVar(id)) {
