@@ -79,6 +79,22 @@ task runAndExec(dependsOn: run, type: Exec) {
 }
 
 
+task genX86_64(dependsOn: run, type: Exec) {
+    def osString = getOsString()
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/llc",
+                "-march=x86-64", "-relocation-model=pic", "-filetype=asm",
+                "${buildDir}/out.ll","-o", "${buildDir}/out_X86-64.s"
+}
+
+
+task genARM(dependsOn: run, type: Exec) {
+    def osString = getOsString()
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/llc",
+            "-march=arm", "-relocation-model=pic", "-filetype=asm",
+            "${buildDir}/out.ll","-o", "${buildDir}/out_ARM.s"
+}
+
+
 task execLL(type: Exec) {
     // set the file like
     // gradle execLL -Pfile=test.ll
