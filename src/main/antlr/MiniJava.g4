@@ -6,7 +6,8 @@ classDecl : 'class' ID ('extends' ID)? '{' (classVarDecl)* (methodDecl)* '}' ;
 classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID (LPAREN (formal (',' formal)*)? RPAREN | PAREN) '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
-type : INT_TYPE | BOOL_TYPE | CHAR_TYPE | ID | type LBRACKET RBRACKET ;
+type : single_type | single_type LBRACKET RBRACKET ;
+single_type : INT_TYPE | BOOL_TYPE | CHAR_TYPE | ID ;
 stmt : varDecl
  | block
  | ifElse

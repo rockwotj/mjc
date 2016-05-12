@@ -50,7 +50,7 @@ public class Compiler {
         ASTBuilder astBuilder = new ASTBuilder();
         walker.walk(astBuilder, parseTreeRoot);
         AbstractSyntaxNode ast = astBuilder.getAbstractSyntaxTree();
-//        System.out.println(ast.toString());
+        System.out.println(ast.toString());
 ////
 //        // Build class info
 //        ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);
