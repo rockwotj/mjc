@@ -101,6 +101,8 @@ public class LlvmIr {
             return "i8";
         } else if (returnType.equals("null")) {
             return "i8*";
+        } else if (returnType.endsWith("[]")) {
+            return getIRType(returnType.substring(0, returnType.length() - 2)) + "*";
         } else {
             return "%class." + returnType + "*";
         }
@@ -256,6 +258,14 @@ public class LlvmIr {
         return getIRType(className);
     }
 
+    public String newArray(String tmpReg1, String tmpReg2, String dstReg, String arrayType, String arrayLength) {
+        arrayType = getIRType(arrayType);
+        addIRLine("%s = sext i32 %s to i64", tmpReg1, arrayLength);
+        addIRLine("%s = call noalias i8* @calloc(i64 %s, i64 %d)", tmpReg2, tmpReg1, getIRTypeSizeInBytes(arrayType));
+        addIRLine("%s = bitcast i8* %s to %s*", dstReg, tmpReg2, arrayType);
+        return dstReg;
+    }
+
     public String newConstruct(String tmpReg1, String dstReg, String tmpReg2, Class clazz) {
         int numElements = clazz.getFields().size() + 1;
         int maxSize = 8; // Always the pointer for the VTable
@@ -335,4 +345,5 @@ public class LlvmIr {
         addIRLine("%s = bitcast %s %s to %s", dstReg, fromType, srcReg, toType);
         return dstReg;
     }
+
 }

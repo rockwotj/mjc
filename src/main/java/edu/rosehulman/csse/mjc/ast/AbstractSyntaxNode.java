@@ -87,6 +87,7 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
 
     private String toString(int level) {
         String result = "{ \"node\": \"" + context.getClass().getSimpleName() + "\"";
+        result += ",\"text\": \"" + context.getText() + "\"";
         result += ",\"children\": [" +
                 String.join(",",
                         children.stream()

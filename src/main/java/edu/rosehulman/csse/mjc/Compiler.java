@@ -4,12 +4,14 @@ package edu.rosehulman.csse.mjc;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import edu.rosehulman.csse.mjc.ast.AbstractSyntaxNode;
+import edu.rosehulman.csse.mjc.reflect.Class;
 import org.antlr.v4.runtime.ANTLRFileStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import edu.rosehulman.csse.mjc.reflect.Class;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class Compiler {
@@ -48,7 +50,7 @@ public class Compiler {
         ASTBuilder astBuilder = new ASTBuilder();
         walker.walk(astBuilder, parseTreeRoot);
         AbstractSyntaxNode ast = astBuilder.getAbstractSyntaxTree();
-        System.out.println(ast.toString());
+//        System.out.println(ast.toString());
 
         // Build class info
         ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);
@@ -60,9 +62,9 @@ public class Compiler {
         typeCheckingWalker.walk();
 //
 //        // Generate Code :)
-//        CodeGenerator codeGenWalker = new CodeGenerator(ast, classList);
-//        codeGenWalker.walk();
-//        String outputIR = codeGenWalker.toString();
-//        Files.write(Paths.get(output), outputIR.getBytes());
+        CodeGenerator codeGenWalker = new CodeGenerator(ast, classList);
+        codeGenWalker.walk();
+        String outputIR = codeGenWalker.toString();
+        Files.write(Paths.get(output), outputIR.getBytes());
     }
 }

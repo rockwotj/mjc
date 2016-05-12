@@ -67,7 +67,6 @@ public class TypeChecker extends BaseWalker {
         String varName = current.getContext().ID().getText();
         String varType = current.getContext().type().getText();
         String resultType = typeStack.pop();
-        System.out.println(varName+ " symtab");
         if (!isAssignable(varType, resultType)) {
             throw new RuntimeException("variable " + varName + " expecting type: " + varType + " got type: " + resultType);
         } else {
@@ -117,7 +116,6 @@ public class TypeChecker extends BaseWalker {
 
     @Override
     protected void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
-        System.out.println(symbolTable);
         String varName = current.getContext().ID().getText();
         String type = getArrayType(symbolTable.lookUpVar(varName));
         String assignmentType = typeStack.pop();

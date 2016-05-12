@@ -21,7 +21,7 @@ ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
 whileDecl : 'while' '(' expr ')' stmt ;
 puts : 'System.out.print' '(' expr ')' ';' ;
 print : 'System.out.println' '(' expr ')' ';' ;
-assigment : ID  '=' expr ';' | ID LBRACKET expr RBRACKET '=' expr ';' ;
+assigment :  ID LBRACKET expr RBRACKET '=' expr ';' | ID  '=' expr ';' ;
 
 expr : logicalOr ;
 

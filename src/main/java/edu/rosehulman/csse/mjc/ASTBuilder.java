@@ -27,7 +27,6 @@ public class ASTBuilder extends MiniJavaBaseListener {
         AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.mainClassDecl);
         currentNode.addChild(node);
         currentNode = node;
-        System.out.println(ctx.getText());
     }
 
     @Override
@@ -398,7 +397,7 @@ public class ASTBuilder extends MiniJavaBaseListener {
 
     @Override
     public void exitAtom(MiniJavaParser.AtomContext ctx) {
-        if (ctx.expr() == null) {
+        if (ctx.expr() == null || ctx.LBRACKET() != null) { // Not an ( expr )
             currentNode = parents.pop();
         }
     }

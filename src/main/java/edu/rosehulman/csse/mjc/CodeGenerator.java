@@ -312,7 +312,7 @@ public class CodeGenerator extends BaseWalker {
     protected void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count) {
         if (count == 0) { /* After the test */
             String ifBodyLabel = getNextLabel();
-            String elseBodyLabel= getNextLabel();
+            String elseBodyLabel = getNextLabel();
             String endLabel = getNextLabel();
             ValueOrRegister prevVal = exprRegisters.pop();
             ir.branch(prevVal.toString(), ifBodyLabel, elseBodyLabel);
@@ -321,7 +321,7 @@ public class CodeGenerator extends BaseWalker {
             lastLabel = ifBodyLabel;
         } else if (count == 1) { /* After the if body */
             IfElseLabels labels = (IfElseLabels) lastLabels.peek();
-            String elseBodyLabel= labels.getElseBody();
+            String elseBodyLabel = labels.getElseBody();
             String endLabel = labels.getEnd();
             ir.jump(endLabel);
             ir.label(elseBodyLabel);
@@ -340,24 +340,9 @@ public class CodeGenerator extends BaseWalker {
     }
 
     @Override
-    protected void betweenPrint(AbstractSyntaxNode<MiniJavaParser.PrintContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current, int count) {
-
-    }
-
-    @Override
-    protected void betweenExpr(AbstractSyntaxNode<MiniJavaParser.ExprContext> current, int count) {
-
-    }
-
-    @Override
     protected void betweenLogicalOr(AbstractSyntaxNode<MiniJavaParser.LogicalOrContext> current, int count) {
         String leftLabel = lastLabel;
-        String rightLabel= getNextLabel();
+        String rightLabel = getNextLabel();
         String endLabel = getNextLabel();
         ValueOrRegister prevVal = exprRegisters.pop();
         ir.branch(prevVal.toString(), endLabel, rightLabel);
@@ -369,7 +354,7 @@ public class CodeGenerator extends BaseWalker {
     @Override
     protected void betweenLogicalAnd(AbstractSyntaxNode<MiniJavaParser.LogicalAndContext> current, int count) {
         String leftLabel = lastLabel;
-        String rightLabel= getNextLabel();
+        String rightLabel = getNextLabel();
         String endLabel = getNextLabel();
         ValueOrRegister prevVal = exprRegisters.pop();
         ir.branch(prevVal.toString(), rightLabel, endLabel);
@@ -407,10 +392,10 @@ public class CodeGenerator extends BaseWalker {
                 String castTo = null;
                 int index = 1;
                 for (Map.Entry<String, String> entry : methodCall.getMethod().getParams().entrySet()) {
-                   if (index == count) {
-                       castTo = entry.getValue();
-                       break;
-                   }
+                    if (index == count) {
+                        castTo = entry.getValue();
+                        break;
+                    }
                     index++;
                 }
                 tempReg = ir.cast(nextRegister(), arg.toString(), castTo, type);
@@ -426,6 +411,19 @@ public class CodeGenerator extends BaseWalker {
         String dstReg = ir.newConstruct(nextRegister(), nextRegister(), nextRegister(), clazz);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, className);
+    }
+
+    @Override
+    protected void exitArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String arrayType = current.getContext().single_type().getText();
+        String arrayLength = exprRegisters.pop().toString();
+        String dstReg = ir.newArray(nextRegister(), nextRegister(), nextRegister(), arrayType, arrayLength);
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, arrayType + "[]");
+    }
+
+    @Override
+    protected void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
     }
 
     @Override
@@ -493,6 +491,7 @@ public class CodeGenerator extends BaseWalker {
     protected void enterMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
         methodArgs.push(new MethodCall());
     }
+
     @Override
     protected void enterWhile(AbstractSyntaxNode<MiniJavaParser.WhileDeclContext> current) {
         String testLabel = getNextLabel();
@@ -514,7 +513,7 @@ public class CodeGenerator extends BaseWalker {
         String methodName = current.getContext().ID().getText();
         Method method = thisClass.getMethods()
                 .stream()
-                .filter(method1 ->  method1.getName().equals(methodName))
+                .filter(method1 -> method1.getName().equals(methodName))
                 .findFirst()
                 .get();
         String mangledName = thisClass.getName() + "_" + method.getName();
