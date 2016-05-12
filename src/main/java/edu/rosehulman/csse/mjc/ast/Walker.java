@@ -139,6 +139,15 @@ public abstract class Walker {
             case puts:
                 enterPuts(current);
                 break;
+            case arrayConstructor:
+                enterArrayConstructor(current);
+                break;
+            case arrayAccess:
+                enterArrayAccess(current);
+                break;
+            case arrayIndexAssigment:
+                enterArrayIndexAssignment(current);
+                break;
         }
         parents.push(current);
         List<AbstractSyntaxNode> children = current.getChildren();
@@ -263,6 +272,15 @@ public abstract class Walker {
                 case puts:
                     betweenPuts(current, count);
                     break;
+                case arrayConstructor:
+                    betweenArrayConstructor(current, count);
+                    break;
+                case arrayAccess:
+                    betweenArrayAccess(current, count);
+                    break;
+                case arrayIndexAssigment:
+                    betweenArrayIndexAssignment(current, count);
+                    break;
             }
             count++;
         }
@@ -382,6 +400,15 @@ public abstract class Walker {
             case puts:
                 exitPuts(current);
                 break;
+            case arrayConstructor:
+                exitArrayConstructor(current);
+                break;
+            case arrayAccess:
+                exitArrayAccess(current);
+                break;
+            case arrayIndexAssigment:
+                exitArrayIndexAssignment(current);
+                break;
         }
     }
 
@@ -469,6 +496,12 @@ public abstract class Walker {
 
     protected abstract void exitConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
 
+    protected abstract void exitArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
+    protected abstract void exitArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
+    protected abstract void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current);
+
 
     protected abstract void betweenProgram(AbstractSyntaxNode<MiniJavaParser.ProgramContext> current, int count);
 
@@ -541,6 +574,19 @@ public abstract class Walker {
     protected abstract void betweenId(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
 
     protected abstract void betweenConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count);
+
+    protected abstract void betweenArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current, int count);
+
+
+    protected abstract void enterArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
+    protected abstract void enterArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
+
+    protected abstract void enterArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current);
 
     protected abstract void enterConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current);
 

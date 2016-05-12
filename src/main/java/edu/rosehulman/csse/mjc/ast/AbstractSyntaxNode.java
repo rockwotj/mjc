@@ -52,7 +52,10 @@ public class AbstractSyntaxNode<T extends ParserRuleContext> {
         id,
         puts,
         character,
-        constructor
+        constructor,
+        arrayConstructor,
+        arrayAccess,
+        arrayIndexAssigment
     }
 
 

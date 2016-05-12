@@ -9,6 +9,51 @@ public abstract class BaseWalker extends Walker {
     }
 
     @Override
+    protected void exitArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
+    protected void enterArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
+    protected void betweenArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void exitArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
+    protected void enterArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+
+    }
+
+    @Override
+    protected void betweenArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current, int count) {
+
+    }
+
+    @Override
+    protected void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
+
+    }
+
+    @Override
+    protected void enterArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
+
+    }
+
+    @Override
+    protected void betweenArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current, int count) {
+
+    }
+
+    @Override
     protected void exitPuts(AbstractSyntaxNode<MiniJavaParser.PutsContext> current) {
 
     }

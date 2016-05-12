@@ -51,20 +51,20 @@ public class Compiler {
         walker.walk(astBuilder, parseTreeRoot);
         AbstractSyntaxNode ast = astBuilder.getAbstractSyntaxTree();
 //        System.out.println(ast.toString());
+////
+//        // Build class info
+//        ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);
+//        chb.walk();
+//        List<Class> classList = chb.getClasses();
 //
-        // Build class info
-        ClassHierarchyBuilder chb = new ClassHierarchyBuilder(ast);
-        chb.walk();
-        List<Class> classList = chb.getClasses();
-
-        // Type checking
-        TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
-        typeCheckingWalker.walk();
-
-        // Generate Code :)
-        CodeGenerator codeGenWalker = new CodeGenerator(ast, classList);
-        codeGenWalker.walk();
-        String outputIR = codeGenWalker.toString();
-        Files.write(Paths.get(output), outputIR.getBytes());
+//        // Type checking
+//        TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
+//        typeCheckingWalker.walk();
+//
+//        // Generate Code :)
+//        CodeGenerator codeGenWalker = new CodeGenerator(ast, classList);
+//        codeGenWalker.walk();
+//        String outputIR = codeGenWalker.toString();
+//        Files.write(Paths.get(output), outputIR.getBytes());
     }
 }

@@ -178,7 +178,12 @@ public class ASTBuilder extends MiniJavaBaseListener {
     @Override
     public void enterAssigment(MiniJavaParser.AssigmentContext ctx) {
         parents.push(currentNode);
-        AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.assigment);
+        AbstractSyntaxNode node;
+        if (ctx.LBRACKET() != null) {
+            node = new AbstractSyntaxNode<>(ctx, NodeType.arrayIndexAssigment);
+        } else {
+            node = new AbstractSyntaxNode<>(ctx, NodeType.assigment);
+        }
         currentNode.addChild(node);
         currentNode = node;
     }
@@ -372,8 +377,12 @@ public class ASTBuilder extends MiniJavaBaseListener {
             node = new AbstractSyntaxNode<>(ctx, NodeType.nil);
         } else if (ctx.THIS() != null) {
             node = new AbstractSyntaxNode<>(ctx, NodeType.self);
+        } else if (ctx.NEW() != null && ctx.LBRACKET() != null) {
+            node = new AbstractSyntaxNode<>(ctx, NodeType.arrayConstructor);
         } else if (ctx.NEW() != null) {
             node = new AbstractSyntaxNode<>(ctx, NodeType.constructor);
+        } else if (ctx.LBRACKET() != null) {
+            node = new AbstractSyntaxNode<>(ctx, NodeType.arrayAccess);
         } else if (ctx.ID() != null) {
             node = new AbstractSyntaxNode<>(ctx, NodeType.id);
         } else if (ctx.CHAR() != null) {

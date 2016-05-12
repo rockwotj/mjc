@@ -6,7 +6,7 @@ classDecl : 'class' ID ('extends' ID)? '{' (classVarDecl)* (methodDecl)* '}' ;
 classVarDecl : type ID ';' ;
 methodDecl : 'public' type ID (LPAREN (formal (',' formal)*)? RPAREN | PAREN) '{' (stmt)* 'return' expr ';' '}' ;
 formal : type ID;
-type : INT_TYPE | BOOL_TYPE | CHAR_TYPE | ID ;
+type : INT_TYPE | BOOL_TYPE | CHAR_TYPE | ID | type LBRACKET RBRACKET ;
 stmt : varDecl
  | block
  | ifElse
@@ -20,7 +20,7 @@ ifElse : 'if' '(' expr ')' stmt 'else' stmt ;
 whileDecl : 'while' '(' expr ')' stmt ;
 puts : 'System.out.print' '(' expr ')' ';' ;
 print : 'System.out.println' '(' expr ')' ';' ;
-assigment : ID  '=' expr ';' ;
+assigment : ID  '=' expr ';' | ID LBRACKET expr RBRACKET '=' expr ';' ;
 
 expr : logicalOr ;
 
@@ -63,6 +63,8 @@ atom :
     | NULL
     | THIS
     | NEW ID (PAREN | LPAREN RPAREN)
+    | NEW type LBRACKET expr RBRACKET
+    | ID LBRACKET expr RBRACKET
     | ID
     | LPAREN expr RPAREN ;
 
@@ -113,6 +115,8 @@ BANG : '!' ;
 // Delimeters
 LPAREN : '(' ;
 RPAREN : ')' ;
+LBRACKET : '[' ;
+RBRACKET : ']' ;
 PAREN  : '()';
 DOT    : '.' ;
 COMMA  : ',' ;
