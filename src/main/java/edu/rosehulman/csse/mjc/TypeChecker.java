@@ -67,6 +67,7 @@ public class TypeChecker extends BaseWalker {
         String varName = current.getContext().ID().getText();
         String varType = current.getContext().type().getText();
         String resultType = typeStack.pop();
+        System.out.println(varName+ " symtab");
         if (!isAssignable(varType, resultType)) {
             throw new RuntimeException("variable " + varName + " expecting type: " + varType + " got type: " + resultType);
         } else {
@@ -111,6 +112,21 @@ public class TypeChecker extends BaseWalker {
         String varType = symbolTable.lookUpVar(var);
         if (!isAssignable(varType, type)) {
             throw new RuntimeException("Cannot assign type of " + type + " to type " + varType);
+        }
+    }
+
+    @Override
+    protected void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
+        System.out.println(symbolTable);
+        String varName = current.getContext().ID().getText();
+        String type = getArrayType(symbolTable.lookUpVar(varName));
+        String assignmentType = typeStack.pop();
+        String assignmentIndex = typeStack.pop();
+        if (!assignmentIndex.equals("int")) {
+            throw new RuntimeException("You can only access arrays by integers");
+        }
+        if (!type.equals(assignmentType)) {
+            throw new RuntimeException("Invalid assignment of array " + varName);
         }
     }
 
@@ -288,6 +304,31 @@ public class TypeChecker extends BaseWalker {
         typeStack.push(symbolTable.lookUpVar(varName));
     }
 
+    @Override
+    protected void exitArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String indexAssignment = typeStack.pop();
+        String varName = current.getContext().ID().getText();
+        String arrayType = symbolTable.lookUpVar(varName);
+        if (!indexAssignment.equals("int")) {
+           throw new RuntimeException("Can only access arrays by integers!");
+        }
+        typeStack.push(getArrayType(arrayType));
+    }
+
+    @Override
+    protected void exitArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String constructedType = current.getContext().single_type().getText();
+        String indexAssignment = typeStack.pop();
+        boolean validClass = isPrimative(constructedType) || classes.stream().anyMatch(c -> c.getName().equals(constructedType));
+        if (!indexAssignment.equals("int")) {
+            throw new RuntimeException("Can only access arrays by integers!");
+        }
+        if (!validClass) {
+            throw new RuntimeException("Class " + constructedType + " does not exist!");
+        }
+        typeStack.push(constructedType + "[]");
+    }
+
     protected void exitConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String constructedType = current.getContext().ID().getText();
         boolean validClass = classes.stream().anyMatch(c -> c.getName().equals(constructedType));
@@ -300,18 +341,6 @@ public class TypeChecker extends BaseWalker {
 
     protected void enterBlock(AbstractSyntaxNode<MiniJavaParser.BlockContext> current) {
         symbolTable = new SymbolTable(symbolTable);
-    }
-
-    protected void enterVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
-    }
-
-    protected void enterStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current) {
-    }
-
-    protected void enterType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current) {
-    }
-
-    protected void enterFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
     }
 
     protected void enterMethodDecl(AbstractSyntaxNode<MiniJavaParser.MethodDeclContext> current) {
@@ -372,6 +401,9 @@ public class TypeChecker extends BaseWalker {
         if (instanceType.equals("null")) {
             return true;
         }
+        if (isArray(containerType) && isArray(instanceType)) {
+           return isAssignable(getArrayType(containerType), getArrayType(instanceType));
+        }
         for (Class c : classes) {
             if (c.getName().equals(instanceType)) {
                 while (c != null) {
@@ -391,7 +423,20 @@ public class TypeChecker extends BaseWalker {
                 name.equals("boolean") ||
                 name.equals("char") ||
                 name.equals("null") ||
-                classes.stream().anyMatch(aClass -> aClass.getName().equals(name));
+                classes.stream().anyMatch(aClass -> aClass.getName().equals(name)) ||
+                isArray(name);
+    }
+
+    private boolean isArray(String name) {
+        return (name.endsWith("[]")) && isValidType(getArrayType(name));
+    }
+
+    private String getArrayType(String name) {
+        if (name.endsWith("[]")) {
+            return name.substring(0, name.length() - 2);
+        } else {
+            return name;
+        }
     }
 
 }

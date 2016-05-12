@@ -27,6 +27,7 @@ public class ASTBuilder extends MiniJavaBaseListener {
         AbstractSyntaxNode node = new AbstractSyntaxNode<>(ctx, NodeType.mainClassDecl);
         currentNode.addChild(node);
         currentNode = node;
+        System.out.println(ctx.getText());
     }
 
     @Override

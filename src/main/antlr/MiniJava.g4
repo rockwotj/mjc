@@ -64,7 +64,7 @@ atom :
     | NULL
     | THIS
     | NEW ID (PAREN | LPAREN RPAREN)
-    | NEW type LBRACKET expr RBRACKET
+    | NEW single_type LBRACKET expr RBRACKET
     | ID LBRACKET expr RBRACKET
     | ID
     | LPAREN expr RPAREN ;

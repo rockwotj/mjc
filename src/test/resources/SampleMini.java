@@ -5,9 +5,10 @@ class Main {
 //        System.out.print('\n');
 //        System.out.println(0);
         int a = 5;
-        int [] A = new int[ a];
-        A[a - 5] = 4;
-        int x = A[a - 5];
+        int [] foobar = new int[ a];
+        int b = a + 2;
+//        foobar[a - 5] = 4;
+//        int x = foobar[a - 5];
     }
 }
 
