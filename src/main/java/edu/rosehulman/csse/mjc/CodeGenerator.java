@@ -424,6 +424,29 @@ public class CodeGenerator extends BaseWalker {
 
     @Override
     protected void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
+        String var = symbolTable.getName(current.getContext().ID().getText());
+        String arrayType = symbolTable.lookUpVar(var);
+        String type = arrayType.substring(0, arrayType.length() - 2);
+        ValueOrRegister assignmentValue = exprRegisters.pop();
+        ValueOrRegister index = exprRegisters.pop();
+        String valOrRegType = getValOrRegType(assignmentValue);
+        String castReg = ir.cast(nextRegister(), assignmentValue.toString(), type, valOrRegType);
+        String arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
+        String elementReg = ir.getArrayElement(nextRegister(), arrayReg, index.toString(), type);
+        ir.store(elementReg, type, castReg);
+    }
+
+    @Override
+    protected void exitArrayAccess(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
+        String var = symbolTable.getName(current.getContext().ID().getText());
+        String arrayType = symbolTable.lookUpVar(var);
+        String type = arrayType.substring(0, arrayType.length() - 2);
+        ValueOrRegister index = exprRegisters.pop();
+        String arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
+        String elementReg = ir.getArrayElement(nextRegister(), arrayReg, index.toString(), type);
+        String dstReg = ir.load(nextRegister(), type, elementReg);
+        exprRegisters.push(new ValueOrRegister(dstReg));
+        symbolTable.addVar(dstReg, type);
     }
 
     @Override

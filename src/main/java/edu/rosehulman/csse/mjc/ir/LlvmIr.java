@@ -339,6 +339,12 @@ public class LlvmIr {
         store(tmpReg, resultType, srcReg);
     }
 
+    public String getArrayElement(String dstReg, String arrayReg, String indexRegOrValue, String type) {
+        String irType = getIRType(type);
+        addIRLine("%s = getelementptr inbounds %s, %s* %s, i32 %s", dstReg, irType, irType, arrayReg, indexRegOrValue);
+        return dstReg;
+    }
+
     public String cast(String dstReg, String srcReg, String toType, String fromType) {
         toType = getIRType(toType);
         fromType = getIRType(fromType);

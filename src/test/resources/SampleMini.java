@@ -1,15 +1,25 @@
 class Main {
     public static void main(String[] args) {
-//        char a = 'a';
-//        System.out.print(a);
-//        System.out.print('\n');
-//        System.out.println(0);
-        int a = 5;
-        int [] foobar = new int[ a];
-//        int b = a + 2;
-//        foobar[a - 5] = 4;
-//        int x = foobar[a - 5];
-//        System.out.println(x);
+        Foo[] F = new Foo[2];
+        F[0] = new Foo();
+        int unused = F[0].set(4);
+        Foo f = new Foo();
+        unused = f.set(8);
+        F[1] = f;
+        System.out.println(F[0].get());
+        System.out.println(F[1].get());
     }
 }
 
+class Foo {
+    int x;
+
+    public int set(int v) {
+        x = v;
+        return x;
+    }
+
+    public int get() {
+        return x;
+    }
+}
