@@ -1,36 +1,20 @@
 class Main {
     public static void main(String[] args) {
-        Foo[] F = new Foo[2];
-        F[0] = new Foo();
-        int unused = F[0].set(4);
-        Foo f = new Foo();
-        unused = f.set(8);
-        F[1] = f;
-        System.out.println(F[0].get());
-        System.out.println(F[1].get());
-        System.out.println(f.get());
-        Foo[] F2 = new Foo[5];
-        F2 = F;
-        System.out.println(F2[0].get());
-        System.out.println(F2[1].get());
-        System.out.println(f.get());
-
-        List list = new List();
-        int ignored = list.init(2);
-        ignored = list.push(42);
-        System.out.println(list.peek());
-        ignored = list.push(13);
-        System.out.println(list.peek());
-        ignored = list.push(17);
-        System.out.println(list.peek());
-        ignored = list.push(22);
-        System.out.println(list.peek());
-        System.out.println(list.pop());
-        System.out.println(list.pop());
-        System.out.println(list.pop());
-        ignored = list.push(12);
-        System.out.println(list.pop());
-        System.out.println(list.pop());
+        string s = new string();
+        int ignored = s.init(0);
+        char blah = s.push('H');
+        blah = s.push('e');
+        blah = s.push('l');
+        blah = s.push('l');
+        blah = s.push('o');
+        blah = s.push(' ');
+        blah = s.push('W');
+        blah = s.push('o');
+        blah = s.push('r');
+        blah = s.push('l');
+        blah = s.push('d');
+        blah = s.push('!');
+        ignored = s.println();
     }
 }
 
@@ -47,23 +31,23 @@ class Foo {
     }
 }
 
-class List {
-    int[] l;
+class string {
+    char[] l;
     int size;
     int capacity;
 
     public int init(int initialCapacity) {
         size = 0;
         capacity = initialCapacity;
-        l = new int[capacity];
+        l = new char[capacity];
         return 0;
     }
 
-    public int push(int val) {
+    public char push(char val) {
         if (size >= capacity) {
             int i = 0;
             capacity = capacity * 2;
-            int[] temp = new int[capacity];
+            char[] temp = new char[capacity];
             while (i < size) {
                 temp[i] = l[i];
                 i = i + 1;
@@ -75,13 +59,23 @@ class List {
         return val;
     }
 
-    public int peek() {
+    public char peek() {
         return l[size - 1];
     }
 
-    public int pop() {
-        int val = l[size - 1];
+    public char pop() {
+        char val = this.peek();
         size = size - 1;
         return val;
+    }
+
+    public int println() {
+        int i = 0;
+        while (i < size) {
+            System.out.print(l[i]);
+            i = i + 1;
+        }
+        System.out.print('\n');
+        return 0;
     }
 }

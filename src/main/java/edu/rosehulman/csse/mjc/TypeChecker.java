@@ -54,15 +54,6 @@ public class TypeChecker extends BaseWalker {
         typeStack.clear();
     }
 
-    protected void exitFormal(AbstractSyntaxNode<MiniJavaParser.FormalContext> current) {
-    }
-
-    protected void exitType(AbstractSyntaxNode<MiniJavaParser.TypeContext> current) {
-    }
-
-    protected void exitStmt(AbstractSyntaxNode<MiniJavaParser.StmtContext> current) {
-    }
-
     protected void exitVarDecl(AbstractSyntaxNode<MiniJavaParser.VarDeclContext> current) {
         String varName = current.getContext().ID().getText();
         String varType = current.getContext().type().getText();
