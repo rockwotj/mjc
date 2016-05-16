@@ -117,7 +117,11 @@ public class TypeChecker extends BaseWalker {
     @Override
     protected void exitArrayIndexAssignment(AbstractSyntaxNode<MiniJavaParser.AssigmentContext> current) {
         String varName = current.getContext().ID().getText();
-        String type = getArrayType(symbolTable.lookUpVar(varName));
+        String arrayType = symbolTable.lookUpVar(varName);
+        if (!isArray(arrayType)) {
+            throw new RuntimeException("Cannot index element of " + varName + " not an array!");
+        }
+        String type = getArrayType(arrayType);
         String assignmentType = typeStack.pop();
         String assignmentIndex = typeStack.pop();
         if (!assignmentIndex.equals("int")) {
@@ -307,6 +311,9 @@ public class TypeChecker extends BaseWalker {
         String indexAssignment = typeStack.pop();
         String varName = current.getContext().ID().getText();
         String arrayType = symbolTable.lookUpVar(varName);
+        if (!isArray(arrayType)) {
+            throw new RuntimeException("Cannot access element of " + varName + " not an array!");
+        }
         if (!indexAssignment.equals("int")) {
            throw new RuntimeException("Can only access arrays by integers!");
         }

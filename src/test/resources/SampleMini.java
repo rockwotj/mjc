@@ -8,6 +8,12 @@ class Main {
         F[1] = f;
         System.out.println(F[0].get());
         System.out.println(F[1].get());
+        System.out.println(f.get());
+        Foo[] F2 = new Foo[5];
+        F2 = F;
+        System.out.println(F2[0].get());
+        System.out.println(F2[1].get());
+        System.out.println(f.get());
     }
 }
 
