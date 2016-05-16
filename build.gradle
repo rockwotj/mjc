@@ -90,7 +90,7 @@ task genX86_64(dependsOn: run, type: Exec) {
 task genARM(dependsOn: run, type: Exec) {
     def osString = getOsString()
     commandLine "${projectDir}/src/main/resources/bin/${osString}/llc",
-            "-march=arm", "-relocation-model=pic", "-filetype=asm",
+            "-mtriple=armv6m-linux-eabi", "-float-abi=hard",
             "${buildDir}/out.ll","-o", "${buildDir}/out_ARM.s"
 }
 
