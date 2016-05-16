@@ -431,7 +431,14 @@ public class CodeGenerator extends BaseWalker {
         ValueOrRegister index = exprRegisters.pop();
         String valOrRegType = getValOrRegType(assignmentValue);
         String castReg = ir.cast(nextRegister(), assignmentValue.toString(), type, valOrRegType);
-        String arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
+        String arrayReg;
+        if (symbolTable.isClassVar(var)) {
+            int objectIndex = thisClass.getFieldIndex(var);
+            String tmpReg = ir.load(nextRegister(), thisClass.getName(), "%this");
+            arrayReg = ir.getClassElement(nextRegister(), nextRegister(), arrayType, thisClass.getName(), tmpReg, objectIndex);
+        } else {
+            arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
+        }
         String elementReg = ir.getArrayElement(nextRegister(), arrayReg, index.toString(), type);
         ir.store(elementReg, type, castReg);
     }
@@ -442,7 +449,14 @@ public class CodeGenerator extends BaseWalker {
         String arrayType = symbolTable.lookUpVar(var);
         String type = arrayType.substring(0, arrayType.length() - 2);
         ValueOrRegister index = exprRegisters.pop();
-        String arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
+        String arrayReg;
+        if (symbolTable.isClassVar(var)) {
+            int objectIndex = thisClass.getFieldIndex(var);
+            String tmpReg = ir.load(nextRegister(), thisClass.getName(), "%this");
+            arrayReg = ir.getClassElement(nextRegister(), nextRegister(), arrayType, thisClass.getName(), tmpReg, objectIndex);
+        } else {
+            arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
+        }
         String elementReg = ir.getArrayElement(nextRegister(), arrayReg, index.toString(), type);
         String dstReg = ir.load(nextRegister(), type, elementReg);
         exprRegisters.push(new ValueOrRegister(dstReg));

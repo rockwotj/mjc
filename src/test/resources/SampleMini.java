@@ -14,6 +14,23 @@ class Main {
         System.out.println(F2[0].get());
         System.out.println(F2[1].get());
         System.out.println(f.get());
+
+        List list = new List();
+        int ignored = list.init(2);
+        ignored = list.push(42);
+        System.out.println(list.peek());
+        ignored = list.push(13);
+        System.out.println(list.peek());
+        ignored = list.push(17);
+        System.out.println(list.peek());
+        ignored = list.push(22);
+        System.out.println(list.peek());
+        System.out.println(list.pop());
+        System.out.println(list.pop());
+        System.out.println(list.pop());
+        ignored = list.push(12);
+        System.out.println(list.pop());
+        System.out.println(list.pop());
     }
 }
 
@@ -27,5 +44,44 @@ class Foo {
 
     public int get() {
         return x;
+    }
+}
+
+class List {
+    int[] l;
+    int size;
+    int capacity;
+
+    public int init(int initialCapacity) {
+        size = 0;
+        capacity = initialCapacity;
+        l = new int[capacity];
+        return 0;
+    }
+
+    public int push(int val) {
+        if (size >= capacity) {
+            int i = 0;
+            capacity = capacity * 2;
+            int[] temp = new int[capacity];
+            while (i < size) {
+                temp[i] = l[i];
+                i = i + 1;
+            }
+            l = temp;
+        } else {}
+        l[size] = val;
+        size = size + 1;
+        return val;
+    }
+
+    public int peek() {
+        return l[size - 1];
+    }
+
+    public int pop() {
+        int val = l[size - 1];
+        size = size - 1;
+        return val;
     }
 }
