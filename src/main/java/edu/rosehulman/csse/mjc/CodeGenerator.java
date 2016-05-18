@@ -302,7 +302,16 @@ public class CodeGenerator extends BaseWalker {
     protected void exitMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current) {
         betweenMethodCall(current, current.getChildren().size() - 1);
         MethodCall methodCall = methodArgs.pop();
-        String dstReg = ir.methodCall(nextRegister(), nextRegister(), nextRegister(), nextRegister(), nextRegister(), methodCall);
+        String dstReg;
+        if (methodCall instanceof ArrayLengthCall) {
+            ArrayLengthCall lengthCall = (ArrayLengthCall) methodCall;
+            // array type should be something like int[]
+            // if you need int just call getArrayType(type)
+            // you will need more registers...
+            dstReg = ir.getArrayLength(nextRegister(), lengthCall.getArrayType(), lengthCall.getRegister());
+        } else {
+            dstReg = ir.methodCall(nextRegister(), nextRegister(), nextRegister(), nextRegister(), nextRegister(), methodCall);
+        }
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, methodCall.getMethod().getReturnType());
     }
@@ -365,13 +374,21 @@ public class CodeGenerator extends BaseWalker {
 
     @Override
     protected void betweenMethodCall(AbstractSyntaxNode<MiniJavaParser.MethodCallContext> current, int count) {
-        MethodCall methodCall = methodArgs.peek();
+        MethodCall methodCall = methodArgs.pop();
         String type, tempReg;
         switch (count) {
             case 0:
                 // Get reciever
                 ValueOrRegister receiverReg = exprRegisters.pop();
                 type = symbolTable.lookUpVar(receiverReg.toString());
+                if (isArray(type)) {
+                    // Special length function!
+                    ArrayLengthCall lengthCall = new ArrayLengthCall();
+                    lengthCall.setArrayType(type);
+                    lengthCall.setRegister(receiverReg.toString());
+                    methodArgs.push(lengthCall);
+                    return;
+                }
                 Class receiverType = getClass(type);
                 List<Method> methods = receiverType.getMethods();
                 for (Method m : methods) {
@@ -402,6 +419,7 @@ public class CodeGenerator extends BaseWalker {
                 methodCall.addArg(tempReg, type);
                 break;
         }
+        methodArgs.push(methodCall);
     }
 
     @Override
@@ -610,6 +628,26 @@ public class CodeGenerator extends BaseWalker {
         return name.equals("int") || name.equals("boolean") || name.equals("char");
     }
 
+    private boolean isValidType(String name) {
+        return name.equals("int") ||
+                name.equals("boolean") ||
+                name.equals("char") ||
+                name.equals("null") ||
+                classList.stream().anyMatch(aClass -> aClass.getName().equals(name)) ||
+                isArray(name);
+    }
+
+    private boolean isArray(String name) {
+        return (name.endsWith("[]")) && isValidType(getArrayType(name));
+    }
+
+    private String getArrayType(String name) {
+        if (name.endsWith("[]")) {
+            return name.substring(0, name.length() - 2);
+        } else {
+            return name;
+        }
+    }
     @Override
     public String toString() {
         return ir.toString();

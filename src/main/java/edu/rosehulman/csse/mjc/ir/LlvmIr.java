@@ -259,6 +259,7 @@ public class LlvmIr {
     }
 
     public String newArray(String tmpReg1, String tmpReg2, String dstReg, String arrayType, String arrayLength) {
+        // FIXME
         arrayType = getIRType(arrayType);
         addIRLine("%s = sext i32 %s to i64", tmpReg1, arrayLength);
         addIRLine("%s = call noalias i8* @calloc(i64 %s, i64 %d)", tmpReg2, tmpReg1, getIRTypeSizeInBytes(arrayType));
@@ -340,6 +341,7 @@ public class LlvmIr {
     }
 
     public String getArrayElement(String dstReg, String arrayReg, String indexRegOrValue, String type) {
+        // FIXME
         String irType = getIRType(type);
         addIRLine("%s = getelementptr inbounds %s, %s* %s, i32 %s", dstReg, irType, irType, arrayReg, indexRegOrValue);
         return dstReg;
@@ -352,4 +354,8 @@ public class LlvmIr {
         return dstReg;
     }
 
+    public String getArrayLength(String dstReg, String arrayType, String register) {
+        // TODO
+       return dstReg;
+    }
 }
