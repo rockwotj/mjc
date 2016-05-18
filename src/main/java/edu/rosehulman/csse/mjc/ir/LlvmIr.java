@@ -18,6 +18,12 @@ public class LlvmIr {
         addIRLine("@.PutsStr = private unnamed_addr constant [3 x i8] c\"%%c\\00\", align 1");
         addIRLine("declare i32 @printf(i8*, ...)");
         addIRLine("declare noalias i8* @calloc(i64, i64)");
+        addIRLine("%%array.boolean = type { i1*, i32 }");
+        addIRLine("%%array.char = type { i8*, i32 }");
+        addIRLine("%%array.int = type { i32*, i32 }");
+        for (Class clazz : classList) {
+            addIRLine("%%array.%s = type { %%class.%s**, i32 }", clazz.getName(), clazz.getName());
+        }
         for (Class clazz : classList) {
             List<String> fieldTypes = new ArrayList<>();
             fieldTypes.addAll(clazz.getFields().values());
@@ -102,7 +108,7 @@ public class LlvmIr {
         } else if (returnType.equals("null")) {
             return "i8*";
         } else if (returnType.endsWith("[]")) {
-            return getIRType(returnType.substring(0, returnType.length() - 2)) + "*";
+            return "%array." + returnType.substring(0, returnType.length() - 2) + "*";
         } else {
             return "%class." + returnType + "*";
         }
@@ -258,13 +264,32 @@ public class LlvmIr {
         return getIRType(className);
     }
 
-    public String newArray(String tmpReg1, String tmpReg2, String dstReg, String arrayType, String arrayLength) {
-        // FIXME
+    public String newArrayStruct(String tmpReg1, String dstReg, String arrayType) {
+        int numElements = 2; // One for pointer one for size
+        int maxSize = 8; // Always the pointer
+        addIRLine("%s = call noalias i8* @calloc(i64 1, i64 %d)", tmpReg1, maxSize * numElements);
+        addIRLine("%s = bitcast i8* %s to %s*", dstReg, tmpReg1, "%array." + arrayType);
+        return dstReg;
+    }
+
+    public String newArrayData(String tmpReg1, String tmpReg2, String dstReg, String arrayType, String arrayLength) {
         arrayType = getIRType(arrayType);
         addIRLine("%s = sext i32 %s to i64", tmpReg1, arrayLength);
         addIRLine("%s = call noalias i8* @calloc(i64 %s, i64 %d)", tmpReg2, tmpReg1, getIRTypeSizeInBytes(arrayType));
         addIRLine("%s = bitcast i8* %s to %s*", dstReg, tmpReg2, arrayType);
         return dstReg;
+    }
+
+    public void setArrayData(String arrayReg, String srcRegOrValue, String tmpReg, String arrayType) {
+        String irType = getIRType(arrayType);
+        addIRLine("%s = getelementptr inbounds %%array.%s, %%array.%s* %s, i32 0, i32 0", tmpReg, arrayType, arrayType, arrayReg);
+        addIRLine("store %s* %s, %s** %s, align 8", irType, srcRegOrValue, irType, tmpReg);
+    }
+
+    public void setArrayLength(String arrayReg, String arrayLength, String tmpReg, String arrayType) {
+        String irType = getIRType(arrayType);
+        addIRLine("%s = getelementptr inbounds %%array.%s, %%array.%s* %s, i32 0, i32 1", tmpReg, arrayType, arrayType, arrayReg);
+        addIRLine("store i32 %s, i32* %s, align 4", arrayLength, tmpReg);
     }
 
     public String newConstruct(String tmpReg1, String dstReg, String tmpReg2, Class clazz) {
@@ -340,10 +365,11 @@ public class LlvmIr {
         store(tmpReg, resultType, srcReg);
     }
 
-    public String getArrayElement(String dstReg, String arrayReg, String indexRegOrValue, String type) {
-        // FIXME
-        String irType = getIRType(type);
-        addIRLine("%s = getelementptr inbounds %s, %s* %s, i32 %s", dstReg, irType, irType, arrayReg, indexRegOrValue);
+    public String getArrayElement(String tmpReg1, String tmpReg2, String dstReg, String arrayReg, String indexRegOrValue, String arrayType) {
+        String irType = getIRType(arrayType);
+        addIRLine("%s = getelementptr inbounds %%array.%s, %%array.%s* %s, i32 0, i32 0", tmpReg1, arrayType, arrayType, arrayReg);
+        addIRLine("%s = load %s*, %s** %s, align 4", tmpReg2, irType, irType, tmpReg1);
+        addIRLine("%s = getelementptr inbounds %s, %s* %s, i32 %s", dstReg, irType, irType, tmpReg2, indexRegOrValue);
         return dstReg;
     }
 
@@ -354,8 +380,9 @@ public class LlvmIr {
         return dstReg;
     }
 
-    public String getArrayLength(String dstReg, String arrayType, String register) {
-        // TODO
-       return dstReg;
+    public String getArrayLength(String tmpReg, String arrayReg, String dstReg, String arrayType) {
+        addIRLine("%s = getelementptr inbounds %%array.%s, %%array.%s* %s, i32 0, i32 1", tmpReg, arrayType, arrayType, arrayReg);
+        addIRLine("%s = load i32, i32* %s, align 4", dstReg, tmpReg);
+        return dstReg;
     }
 }

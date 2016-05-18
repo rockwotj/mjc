@@ -305,17 +305,13 @@ public class CodeGenerator extends BaseWalker {
         String dstReg;
         if (methodCall instanceof ArrayLengthCall) {
             ArrayLengthCall lengthCall = (ArrayLengthCall) methodCall;
-            // array type should be something like int[]
-            // if you need int just call getArrayType(type)
-            // you will need more registers...
-            dstReg = ir.getArrayLength(nextRegister(), lengthCall.getArrayType(), lengthCall.getRegister());
+            dstReg = ir.getArrayLength(nextRegister(), lengthCall.getRegister(), nextRegister(), getArrayType(lengthCall.getArrayType()));
         } else {
             dstReg = ir.methodCall(nextRegister(), nextRegister(), nextRegister(), nextRegister(), nextRegister(), methodCall);
         }
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, methodCall.getMethod().getReturnType());
     }
-
 
     @Override
     protected void betweenIfElse(AbstractSyntaxNode<MiniJavaParser.IfElseContext> current, int count) {
@@ -435,7 +431,10 @@ public class CodeGenerator extends BaseWalker {
     protected void exitArrayConstructor(AbstractSyntaxNode<MiniJavaParser.AtomContext> current) {
         String arrayType = current.getContext().single_type().getText();
         String arrayLength = exprRegisters.pop().toString();
-        String dstReg = ir.newArray(nextRegister(), nextRegister(), nextRegister(), arrayType, arrayLength);
+        String dstReg = ir.newArrayStruct(nextRegister(), nextRegister(), arrayType);
+        String dataReg = ir.newArrayData(nextRegister(), nextRegister(), nextRegister(), arrayType, arrayLength);
+        ir.setArrayData(dstReg, dataReg, nextRegister(), arrayType);
+        ir.setArrayLength(dstReg, arrayLength, nextRegister(), arrayType);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, arrayType + "[]");
     }
@@ -457,7 +456,7 @@ public class CodeGenerator extends BaseWalker {
         } else {
             arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
         }
-        String elementReg = ir.getArrayElement(nextRegister(), arrayReg, index.toString(), type);
+        String elementReg = ir.getArrayElement(nextRegister(), nextRegister(), nextRegister(), arrayReg, index.toString(), getArrayType(arrayType));
         ir.store(elementReg, type, castReg);
     }
 
@@ -475,7 +474,7 @@ public class CodeGenerator extends BaseWalker {
         } else {
             arrayReg = ir.load(nextRegister(), arrayType, "%" + var);
         }
-        String elementReg = ir.getArrayElement(nextRegister(), arrayReg, index.toString(), type);
+        String elementReg = ir.getArrayElement(nextRegister(), nextRegister(), nextRegister(), arrayReg, index.toString(), getArrayType(arrayType));
         String dstReg = ir.load(nextRegister(), type, elementReg);
         exprRegisters.push(new ValueOrRegister(dstReg));
         symbolTable.addVar(dstReg, type);
