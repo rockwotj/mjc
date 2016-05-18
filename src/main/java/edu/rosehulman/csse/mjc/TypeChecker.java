@@ -7,10 +7,7 @@ import edu.rosehulman.csse.mjc.reflect.ClassSymbolTable;
 import edu.rosehulman.csse.mjc.reflect.Method;
 import edu.rosehulman.csse.mjc.reflect.SymbolTable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
 
 
 public class TypeChecker extends BaseWalker {
@@ -256,6 +253,13 @@ public class TypeChecker extends BaseWalker {
                 }
                 break;
             }
+        }
+        if (method == null) {
+           if (isArray(classType) && methodName.equals("length")) {
+                method = new Method("int", new HashMap<>(), "length");
+           } else {
+               throw new RuntimeException("Primative types do not have methods!");
+           }
         }
         if (method.getParamTypes().size() != numParams) {
             throw new RuntimeException(methodName + " has an incorrect number of parameters");

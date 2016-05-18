@@ -15,19 +15,19 @@ class Main {
         s[9] = 'l';
         s[10] = 'd';
         s[11] = '!';
-        ignored = p.printString(s, 12);
+        ignored = p.printString(s);
 
         int i = 0;
         Fib f = new Fib();
         ignored = f.init();
         /* Computer Fibonacci Sequence computing each value directly. */
-        while( i < 10 ) {
+        while (i < 10) {
             System.out.println(f.fib(i));
             i = i + 1;
         }
         i = 0;
         /* Use Fibonacci Sequence iterator. */
-        while( i < 10 ) {
+        while (i < 10) {
             System.out.println(f.next());
             i = i + 1;
         }
@@ -44,7 +44,7 @@ class Fib {
         return 0;
     }
 
-    public int next(){
+    public int next() {
         int val = 0;
         if (current == 0) {
             val = 1;
@@ -68,9 +68,9 @@ class Fib {
 }
 
 class Printer {
-    public int printString(char[] s, int length) {
+    public int printString(char[] s) {
         int i = 0;
-        while (i < length) {
+        while (i < s.length()) {
             System.out.print(s[i]);
             i = i + 1;
         }

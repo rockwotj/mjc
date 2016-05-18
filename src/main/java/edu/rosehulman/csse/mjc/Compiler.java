@@ -45,6 +45,12 @@ public class Compiler {
         // Specify parser grammer entry point
         MiniJavaParser.ProgramContext parseTreeRoot = parser.program();
 
+        if (parser.getNumberOfSyntaxErrors() > 0) {
+            System.err.println("Please correct your syntax errors :)");
+            System.exit(1);
+            return;
+        }
+
         // Walk parse tree and create AST
         ParseTreeWalker walker = new ParseTreeWalker();
         ASTBuilder astBuilder = new ASTBuilder();
@@ -60,8 +66,8 @@ public class Compiler {
         // Type checking
         TypeChecker typeCheckingWalker = new TypeChecker(ast, classList);
         typeCheckingWalker.walk();
-//
-//        // Generate Code :)
+
+        // Generate Code :)
         CodeGenerator codeGenWalker = new CodeGenerator(ast, classList);
         codeGenWalker.walk();
         String outputIR = codeGenWalker.toString();
