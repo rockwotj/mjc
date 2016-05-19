@@ -95,6 +95,20 @@ task genARM(dependsOn: run, type: Exec) {
 }
 
 
+task optimizeByteCode(dependsOn: run, type: Exec) {
+    def osString = getOsString()
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/opt",
+            "-O3","${buildDir}/out.ll","-o", "${buildDir}/out_OPT.bc"
+}
+
+
+task optimize(dependsOn: optimizeByteCode, type: Exec) {
+    def osString = getOsString()
+    commandLine "${projectDir}/src/main/resources/bin/${osString}/llvm-dis",
+            "${buildDir}/out_OPT.bc", "-o", "${buildDir}/out_OPT.ll"
+}
+
+
 task execLL(type: Exec) {
     // set the file like
     // gradle execLL -Pfile=test.ll
